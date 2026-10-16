@@ -2,7 +2,7 @@
 
 **Εφαρμογή μεθόδων μηχανικής μάθησης σε δεδομένα μοντέλων προσομοίωσης κτιρίων για την ανάλυση της ενεργειακής κατανάλωσης σε έξυπνες πόλεις: κλιματικά σενάρια, δείκτες ESG και υποστήριξη αποφάσεων**
 
-Διπλωματική εργασία — ΔΠΜΣ στα Πληροφοριακά Συστήματα, Πανεπιστήμιο Μακεδονίας (2026)
+Διπλωματική εργασία — ΔΠΜΣ στα Πληροφοριακά Συστήματα, Πανεπιστήμιο Μακεδονίας (2026)<br>
 Συγγραφέας: Αριστοτέλης Ζυγούρης · Επιβλέπων: Κωνσταντίνος Ταραμπάνης
 
 > **English summary.** Reproducible Python pipeline of the thesis. It uses 5,000 individual buildings from NREL ResStock 2024 R2 and ComStock 2023 R2 (600 residential + 400 commercial in Houston 2A, Atlanta 3A, Baltimore 4A, Chicago 5A and Denver 5B; 43.8 M hourly records, weather AMY2018). It covers hourly forecasting (persistence, seasonal naive, Ridge, Random Forest, XGBoost with per-building scaling; Denver held out), statistical significance (cluster bootstrap and Diebold–Mariano), IPCC AR6 climate scenarios through a separate weather model, the diversity factor, CO₂ per m² and grid-decarbonisation what-if, household energy burden, a composite E+S index with weight sensitivity, and an interactive dashboard. Every number and figure of the thesis is produced by these scripts.
