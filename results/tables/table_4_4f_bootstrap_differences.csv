@@ -1,0 +1,19 @@
+﻿Σύνολο,Τύπος,Σύγκριση,Διαφορά skill,95% ΔΕ κάτω,95% ΔΕ άνω,p (bootstrap),Σημαντική (5%)
+Έλεγχος 2A–5A,Όλα,XGBoost − Random Forest,0.1191,0.0983,0.1363,0.0,ναι
+Έλεγχος 2A–5A,Όλα,XGBoost − Ridge Regression,0.2628,0.2359,0.288,0.0,ναι
+Έλεγχος 2A–5A,Όλα,Random Forest − Ridge Regression,0.1438,0.1281,0.1642,0.0,ναι
+Έλεγχος 2A–5A,Οικιστικά,XGBoost − Random Forest,0.0189,0.0148,0.0234,0.0,ναι
+Έλεγχος 2A–5A,Οικιστικά,XGBoost − Ridge Regression,0.0559,0.0511,0.0616,0.0,ναι
+Έλεγχος 2A–5A,Οικιστικά,Random Forest − Ridge Regression,0.037,0.033,0.0423,0.0,ναι
+Έλεγχος 2A–5A,Εμπορικά,XGBoost − Random Forest,0.1192,0.0979,0.1369,0.0,ναι
+Έλεγχος 2A–5A,Εμπορικά,XGBoost − Ridge Regression,0.2631,0.237,0.2884,0.0,ναι
+Έλεγχος 2A–5A,Εμπορικά,Random Forest − Ridge Regression,0.1439,0.1271,0.1642,0.0,ναι
+Denver 5B (OOS),Όλα,XGBoost − Random Forest,-0.032,-0.0744,0.0072,0.13,όχι
+Denver 5B (OOS),Όλα,XGBoost − Ridge Regression,0.071,0.0245,0.1305,0.0,ναι
+Denver 5B (OOS),Όλα,Random Forest − Ridge Regression,0.103,0.0657,0.1485,0.0,ναι
+Denver 5B (OOS),Οικιστικά,XGBoost − Random Forest,-0.0329,-0.0464,-0.0188,0.0,ναι
+Denver 5B (OOS),Οικιστικά,XGBoost − Ridge Regression,-0.0089,-0.0213,0.0044,0.177,όχι
+Denver 5B (OOS),Οικιστικά,Random Forest − Ridge Regression,0.024,0.0183,0.03,0.0,ναι
+Denver 5B (OOS),Εμπορικά,XGBoost − Random Forest,-0.032,-0.0723,0.0076,0.122,όχι
+Denver 5B (OOS),Εμπορικά,XGBoost − Ridge Regression,0.0712,0.0258,0.1336,0.003,ναι
+Denver 5B (OOS),Εμπορικά,Random Forest − Ridge Regression,0.1032,0.0653,0.1484,0.0,ναι

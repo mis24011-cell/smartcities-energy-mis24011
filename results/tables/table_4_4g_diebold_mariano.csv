@@ -1,0 +1,13 @@
+﻿Σύνολο,Σύγκριση,Ώρες T,Μέση διαφορά απώλειας ανά ώρα (10³ kWh²),DM (HLN),p,Καλύτερο
+Έλεγχος 2A–5A,XGBoost vs Random Forest,2016,-471.3,-17.205,5.28e-62,XGBoost
+Έλεγχος 2A–5A,XGBoost vs Ridge Regression,2016,-1150.83,-20.549,2.4e-85,XGBoost
+Έλεγχος 2A–5A,Random Forest vs Ridge Regression,2016,-679.53,-14.435,5.03e-45,Random Forest
+Έλεγχος 2A–5A,Ridge Regression vs Persistence (t−1h),2016,-655.72,-12.561,6.78e-35,Ridge Regression
+Έλεγχος 2A–5A,Random Forest vs Persistence (t−1h),2016,-1335.25,-18.231,7.42e-69,Random Forest
+Έλεγχος 2A–5A,XGBoost vs Persistence (t−1h),2016,-1806.56,-24.851,3.87e-119,XGBoost
+Denver 5B (OOS),XGBoost vs Random Forest,2016,29.75,0.75,0.453,Random Forest
+Denver 5B (OOS),XGBoost vs Ridge Regression,2016,-70.1,-1.843,0.0655,XGBoost
+Denver 5B (OOS),Random Forest vs Ridge Regression,2016,-99.85,-10.623,1.09e-25,Random Forest
+Denver 5B (OOS),Ridge Regression vs Persistence (t−1h),2016,-87.84,-5.154,2.8e-07,Ridge Regression
+Denver 5B (OOS),Random Forest vs Persistence (t−1h),2016,-187.69,-11.064,1.15e-27,Random Forest
+Denver 5B (OOS),XGBoost vs Persistence (t−1h),2016,-157.94,-3.083,0.00208,XGBoost

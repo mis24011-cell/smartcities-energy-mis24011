@@ -1,0 +1,146 @@
+﻿Πόλη,Κατηγορία,%,Μεταβλητή
+Houston,Αποθήκη,42.2,Τύπος κτιρίου
+Atlanta,Αποθήκη,24.2,Τύπος κτιρίου
+Baltimore,Αποθήκη,19.0,Τύπος κτιρίου
+Chicago,Αποθήκη,21.5,Τύπος κτιρίου
+Denver,Αποθήκη,34.8,Τύπος κτιρίου
+Houston,Εμπορικό κέντρο,14.8,Τύπος κτιρίου
+Atlanta,Εμπορικό κέντρο,13.2,Τύπος κτιρίου
+Baltimore,Εμπορικό κέντρο,47.0,Τύπος κτιρίου
+Chicago,Εμπορικό κέντρο,43.0,Τύπος κτιρίου
+Denver,Εμπορικό κέντρο,19.5,Τύπος κτιρίου
+Houston,Μικρό γραφείο,14.5,Τύπος κτιρίου
+Atlanta,Μικρό γραφείο,24.0,Τύπος κτιρίου
+Baltimore,Μικρό γραφείο,14.2,Τύπος κτιρίου
+Chicago,Μικρό γραφείο,11.2,Τύπος κτιρίου
+Denver,Μικρό γραφείο,16.2,Τύπος κτιρίου
+Houston,Κατάστημα,15.2,Τύπος κτιρίου
+Atlanta,Κατάστημα,18.0,Τύπος κτιρίου
+Baltimore,Κατάστημα,6.8,Τύπος κτιρίου
+Chicago,Κατάστημα,9.5,Τύπος κτιρίου
+Denver,Κατάστημα,11.2,Τύπος κτιρίου
+Houston,Εστιατόριο,3.5,Τύπος κτιρίου
+Atlanta,Εστιατόριο,2.8,Τύπος κτιρίου
+Baltimore,Εστιατόριο,4.2,Τύπος κτιρίου
+Chicago,Εστιατόριο,3.5,Τύπος κτιρίου
+Denver,Εστιατόριο,6.8,Τύπος κτιρίου
+Houston,Μεσαίο γραφείο,2.0,Τύπος κτιρίου
+Atlanta,Μεσαίο γραφείο,3.8,Τύπος κτιρίου
+Baltimore,Μεσαίο γραφείο,2.5,Τύπος κτιρίου
+Chicago,Μεσαίο γραφείο,2.5,Τύπος κτιρίου
+Denver,Μεσαίο γραφείο,1.2,Τύπος κτιρίου
+Houston,Μεγάλο γραφείο,0.8,Τύπος κτιρίου
+Atlanta,Μεγάλο γραφείο,6.0,Τύπος κτιρίου
+Baltimore,Μεγάλο γραφείο,1.2,Τύπος κτιρίου
+Chicago,Μεγάλο γραφείο,0.8,Τύπος κτιρίου
+Denver,Μεγάλο γραφείο,2.2,Τύπος κτιρίου
+Houston,Λοιπά,7.0,Τύπος κτιρίου
+Atlanta,Λοιπά,8.0,Τύπος κτιρίου
+Baltimore,Λοιπά,5.0,Τύπος κτιρίου
+Chicago,Λοιπά,8.0,Τύπος κτιρίου
+Denver,Λοιπά,8.0,Τύπος κτιρίου
+Houston,Πριν το 1946,4.8,Περίοδος κατασκευής
+Atlanta,Πριν το 1946,15.5,Περίοδος κατασκευής
+Baltimore,Πριν το 1946,68.0,Περίοδος κατασκευής
+Chicago,Πριν το 1946,40.8,Περίοδος κατασκευής
+Denver,Πριν το 1946,31.0,Περίοδος κατασκευής
+Houston,1946–1959,12.5,Περίοδος κατασκευής
+Atlanta,1946–1959,17.0,Περίοδος κατασκευής
+Baltimore,1946–1959,13.5,Περίοδος κατασκευής
+Chicago,1946–1959,14.8,Περίοδος κατασκευής
+Denver,1946–1959,19.2,Περίοδος κατασκευής
+Houston,1960–1969,12.0,Περίοδος κατασκευής
+Atlanta,1960–1969,14.0,Περίοδος κατασκευής
+Baltimore,1960–1969,7.5,Περίοδος κατασκευής
+Chicago,1960–1969,12.2,Περίοδος κατασκευής
+Denver,1960–1969,15.0,Περίοδος κατασκευής
+Houston,1970–1979,18.8,Περίοδος κατασκευής
+Atlanta,1970–1979,16.0,Περίοδος κατασκευής
+Baltimore,1970–1979,4.0,Περίοδος κατασκευής
+Chicago,1970–1979,10.5,Περίοδος κατασκευής
+Denver,1970–1979,13.0,Περίοδος κατασκευής
+Houston,1980–1989,17.0,Περίοδος κατασκευής
+Atlanta,1980–1989,15.5,Περίοδος κατασκευής
+Baltimore,1980–1989,4.0,Περίοδος κατασκευής
+Chicago,1980–1989,10.5,Περίοδος κατασκευής
+Denver,1980–1989,8.2,Περίοδος κατασκευής
+Houston,1990–1999,18.5,Περίοδος κατασκευής
+Atlanta,1990–1999,9.8,Περίοδος κατασκευής
+Baltimore,1990–1999,2.2,Περίοδος κατασκευής
+Chicago,1990–1999,5.0,Περίοδος κατασκευής
+Denver,1990–1999,8.0,Περίοδος κατασκευής
+Houston,2000–2012,13.8,Περίοδος κατασκευής
+Atlanta,2000–2012,9.0,Περίοδος κατασκευής
+Baltimore,2000–2012,0.8,Περίοδος κατασκευής
+Chicago,2000–2012,5.0,Περίοδος κατασκευής
+Denver,2000–2012,4.0,Περίοδος κατασκευής
+Houston,Λοιπά,2.8,Περίοδος κατασκευής
+Atlanta,Λοιπά,3.2,Περίοδος κατασκευής
+Baltimore,Λοιπά,0.0,Περίοδος κατασκευής
+Chicago,Λοιπά,1.2,Περίοδος κατασκευής
+Denver,Λοιπά,1.5,Περίοδος κατασκευής
+Houston,Φυσικό αέριο,59.0,Καύσιμο θέρμανσης
+Atlanta,Φυσικό αέριο,61.8,Καύσιμο θέρμανσης
+Baltimore,Φυσικό αέριο,81.8,Καύσιμο θέρμανσης
+Chicago,Φυσικό αέριο,93.8,Καύσιμο θέρμανσης
+Denver,Φυσικό αέριο,71.2,Καύσιμο θέρμανσης
+Houston,Ηλεκτρισμός,40.2,Καύσιμο θέρμανσης
+Atlanta,Ηλεκτρισμός,35.8,Καύσιμο θέρμανσης
+Baltimore,Ηλεκτρισμός,16.8,Καύσιμο θέρμανσης
+Chicago,Ηλεκτρισμός,5.8,Καύσιμο θέρμανσης
+Denver,Ηλεκτρισμός,25.8,Καύσιμο θέρμανσης
+Houston,Τηλεθέρμανση,0.5,Καύσιμο θέρμανσης
+Atlanta,Τηλεθέρμανση,2.2,Καύσιμο θέρμανσης
+Baltimore,Τηλεθέρμανση,0.2,Καύσιμο θέρμανσης
+Chicago,Τηλεθέρμανση,0.5,Καύσιμο θέρμανσης
+Denver,Τηλεθέρμανση,2.5,Καύσιμο θέρμανσης
+Houston,Προπάνιο,0.2,Καύσιμο θέρμανσης
+Atlanta,Προπάνιο,0.2,Καύσιμο θέρμανσης
+Baltimore,Προπάνιο,0.2,Καύσιμο θέρμανσης
+Chicago,Προπάνιο,0.0,Καύσιμο θέρμανσης
+Denver,Προπάνιο,0.5,Καύσιμο θέρμανσης
+Houston,Πετρέλαιο,0.0,Καύσιμο θέρμανσης
+Atlanta,Πετρέλαιο,0.0,Καύσιμο θέρμανσης
+Baltimore,Πετρέλαιο,1.0,Καύσιμο θέρμανσης
+Chicago,Πετρέλαιο,0.0,Καύσιμο θέρμανσης
+Denver,Πετρέλαιο,0.0,Καύσιμο θέρμανσης
+Houston,PSZ-AC with gas coil,29.2,Σύστημα HVAC
+Atlanta,PSZ-AC with gas coil,45.2,Σύστημα HVAC
+Baltimore,PSZ-AC with gas coil,64.2,Σύστημα HVAC
+Chicago,PSZ-AC with gas coil,53.2,Σύστημα HVAC
+Denver,PSZ-AC with gas coil,53.8,Σύστημα HVAC
+Houston,PVAV with gas boiler reheat,8.8,Σύστημα HVAC
+Atlanta,PVAV with gas boiler reheat,6.8,Σύστημα HVAC
+Baltimore,PVAV with gas boiler reheat,8.8,Σύστημα HVAC
+Chicago,PVAV with gas boiler reheat,19.8,Σύστημα HVAC
+Denver,PVAV with gas boiler reheat,4.0,Σύστημα HVAC
+Houston,PSZ-AC with electric coil,18.5,Σύστημα HVAC
+Atlanta,PSZ-AC with electric coil,11.5,Σύστημα HVAC
+Baltimore,PSZ-AC with electric coil,5.8,Σύστημα HVAC
+Chicago,PSZ-AC with electric coil,1.2,Σύστημα HVAC
+Denver,PSZ-AC with electric coil,6.8,Σύστημα HVAC
+Houston,Residential AC with residential forced air furnace,18.0,Σύστημα HVAC
+Atlanta,Residential AC with residential forced air furnace,3.0,Σύστημα HVAC
+Baltimore,Residential AC with residential forced air furnace,3.2,Σύστημα HVAC
+Chicago,Residential AC with residential forced air furnace,9.5,Σύστημα HVAC
+Denver,Residential AC with residential forced air furnace,7.2,Σύστημα HVAC
+Houston,PVAV with gas heat with electric reheat,7.0,Σύστημα HVAC
+Atlanta,PVAV with gas heat with electric reheat,3.2,Σύστημα HVAC
+Baltimore,PVAV with gas heat with electric reheat,2.5,Σύστημα HVAC
+Chicago,PVAV with gas heat with electric reheat,2.0,Σύστημα HVAC
+Denver,PVAV with gas heat with electric reheat,7.8,Σύστημα HVAC
+Houston,PVAV with PFP boxes,6.8,Σύστημα HVAC
+Atlanta,PVAV with PFP boxes,2.2,Σύστημα HVAC
+Baltimore,PVAV with PFP boxes,1.5,Σύστημα HVAC
+Chicago,PVAV with PFP boxes,1.0,Σύστημα HVAC
+Denver,PVAV with PFP boxes,5.0,Σύστημα HVAC
+Houston,PSZ-HP,0.0,Σύστημα HVAC
+Atlanta,PSZ-HP,7.8,Σύστημα HVAC
+Baltimore,PSZ-HP,3.2,Σύστημα HVAC
+Chicago,PSZ-HP,0.2,Σύστημα HVAC
+Denver,PSZ-HP,3.5,Σύστημα HVAC
+Houston,Λοιπά,11.8,Σύστημα HVAC
+Atlanta,Λοιπά,20.2,Σύστημα HVAC
+Baltimore,Λοιπά,10.8,Σύστημα HVAC
+Chicago,Λοιπά,13.0,Σύστημα HVAC
+Denver,Λοιπά,12.0,Σύστημα HVAC

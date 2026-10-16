@@ -1,0 +1,6 @@
+﻿city,zone,N,income_below_10k_%,renters_%,built_before_1960_%,electric_heating_%,gas_heating_%,median_floor_area_m2
+Houston,2A,138,28.3,75.4,19.6,74.6,23.9,79.0
+Atlanta,3A,131,32.1,77.9,23.7,55.7,44.3,106.0
+Baltimore,4A,122,54.1,85.2,68.9,37.7,55.7,79.0
+Chicago,5A,137,33.6,65.0,51.1,13.1,86.1,82.0
+Denver,5B,142,20.4,73.2,39.4,28.9,69.0,79.0

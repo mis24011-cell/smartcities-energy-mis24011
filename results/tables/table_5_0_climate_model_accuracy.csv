@@ -1,0 +1,11 @@
+﻿Μοντέλο,N,R²,RMSE (kWh/h),MAE (kWh/h),MAPE (%),CV(RMSE) (%),NMBE (%)
+"Climate model — hourly EUI (Wh/m²), test",10080000,0.8874,15.064,8.6182,98.02,54.88,-0.34
+"Climate model — hourly EUI, test, residential",6048000,0.5619,14.0237,8.5336,138.95,71.64,-0.33
+"Climate model — hourly EUI, test, commercial",4032000,0.9341,16.5018,8.745,36.62,42.03,-0.35
+"Climate model — hourly EUI, test, Houston",2016000,0.9496,9.4141,5.4392,82.9,45.41,0.09
+"Climate model — hourly EUI, test, Atlanta",2016000,0.9403,11.4637,6.4394,111.68,52.62,-0.55
+"Climate model — hourly EUI, test, Baltimore",2016000,0.8061,18.2923,11.0308,128.06,59.14,-0.65
+"Climate model — hourly EUI, test, Chicago",2016000,0.7838,16.7895,10.3241,80.05,52.53,2.76
+"Climate model — hourly EUI, test, Denver",2016000,0.8992,17.2649,9.8575,87.41,54.21,-3.29
+"Climate model — annual EUI (kWh/m²·yr), residential",3000,0.6426,65.4172,45.5978,38.31,35.24,-0.07
+"Climate model — annual EUI (kWh/m²·yr), commercial",2000,0.9705,80.5488,39.296,11.22,22.54,-0.08

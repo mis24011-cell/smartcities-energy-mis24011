@@ -1,0 +1,484 @@
+{
+  "n_buildings": 5000,
+  "n_by_city_type": {
+    "Atlanta": {
+      "commercial": 400,
+      "residential": 600
+    },
+    "Baltimore": {
+      "commercial": 400,
+      "residential": 600
+    },
+    "Chicago": {
+      "commercial": 400,
+      "residential": 600
+    },
+    "Denver": {
+      "commercial": 400,
+      "residential": 600
+    },
+    "Houston": {
+      "commercial": 400,
+      "residential": 600
+    }
+  },
+  "bldg_id_collisions": 8,
+  "rows_hourly": 43800000,
+  "area_source_residential": "NREL numeric column 'in.sqft'",
+  "area_m2": {
+    "commercial": {
+      "count": 2000.0,
+      "mean": 4424.6,
+      "std": 7602.0,
+      "min": 92.9,
+      "25%": 696.8,
+      "50%": 1625.8,
+      "75%": 6967.7,
+      "max": 92903.0
+    },
+    "residential": {
+      "count": 3000.0,
+      "mean": 141.9,
+      "std": 101.1,
+      "min": 25.4,
+      "25%": 79.3,
+      "50%": 112.1,
+      "75%": 157.7,
+      "max": 688.8
+    }
+  },
+  "income_le0_excluded": 325,
+  "income_le0_by_city": {
+    "Atlanta": 76,
+    "Baltimore": 115,
+    "Chicago": 52,
+    "Denver": 33,
+    "Houston": 49
+  },
+  "zero_site_hours": [
+    [
+      "Houston",
+      "residential",
+      8788,
+      2,
+      7689
+    ],
+    [
+      "Houston",
+      "commercial",
+      0,
+      0,
+      0
+    ],
+    [
+      "Atlanta",
+      "residential",
+      2840,
+      1,
+      2840
+    ],
+    [
+      "Atlanta",
+      "commercial",
+      0,
+      0,
+      0
+    ],
+    [
+      "Baltimore",
+      "residential",
+      0,
+      0,
+      0
+    ],
+    [
+      "Baltimore",
+      "commercial",
+      0,
+      0,
+      0
+    ],
+    [
+      "Chicago",
+      "residential",
+      2190,
+      1,
+      2190
+    ],
+    [
+      "Chicago",
+      "commercial",
+      0,
+      0,
+      0
+    ],
+    [
+      "Denver",
+      "residential",
+      4786,
+      1,
+      4786
+    ],
+    [
+      "Denver",
+      "commercial",
+      0,
+      0,
+      0
+    ]
+  ],
+  "qc_technical_flags": 14,
+  "qc_eui_outliers": 69,
+  "funnel": {
+    "nrel_total_res": 549718,
+    "nrel_total_com": 336149,
+    "by_city": {
+      "Houston": {
+        "zone_res": 64139,
+        "city_res": 6967,
+        "zone_com": 39630,
+        "city_com": 4862,
+        "geo_col_res": "in.county",
+        "geo_col_com": "in.nhgis_county_gisjoin"
+      },
+      "Atlanta": {
+        "zone_res": 73609,
+        "city_res": 1856,
+        "zone_com": 47472,
+        "city_com": 1381,
+        "geo_col_res": "in.county",
+        "geo_col_com": "in.nhgis_county_gisjoin"
+      },
+      "Baltimore": {
+        "zone_res": 119117,
+        "city_res": 1226,
+        "zone_com": 69051,
+        "city_com": 1039,
+        "geo_col_res": "in.county",
+        "geo_col_com": "in.nhgis_county_gisjoin"
+      },
+      "Chicago": {
+        "zone_res": 124668,
+        "city_res": 8985,
+        "zone_com": 76703,
+        "city_com": 4982,
+        "geo_col_res": "in.county",
+        "geo_col_com": "in.nhgis_county_gisjoin"
+      },
+      "Denver": {
+        "zone_res": 20960,
+        "city_res": 1235,
+        "zone_com": 13499,
+        "city_com": 963,
+        "geo_col_res": "in.county",
+        "geo_col_com": "in.nhgis_county_gisjoin"
+      }
+    }
+  },
+  "site_minus_fuels_pct": [
+    [
+      "Houston",
+      "residential",
+      0.0
+    ],
+    [
+      "Houston",
+      "commercial",
+      0.0
+    ],
+    [
+      "Atlanta",
+      "residential",
+      0.0
+    ],
+    [
+      "Atlanta",
+      "commercial",
+      0.0
+    ],
+    [
+      "Baltimore",
+      "residential",
+      0.0
+    ],
+    [
+      "Baltimore",
+      "commercial",
+      0.0
+    ],
+    [
+      "Chicago",
+      "residential",
+      0.0
+    ],
+    [
+      "Chicago",
+      "commercial",
+      0.0
+    ],
+    [
+      "Denver",
+      "residential",
+      0.0
+    ],
+    [
+      "Denver",
+      "commercial",
+      0.0
+    ]
+  ],
+  "emission_bill_columns": [
+    "calc.emissions.total_with_cambium_mid_case_15y..co2e_kg",
+    "calc.emissions.total_with_egrid..co2e_kg",
+    "calc.weighted.emissions.electricity.egrid_2021_subregion..co2e_mmt",
+    "calc.weighted.emissions.electricity.lrmer_high_re_cost_15_2023_start..co2e_mmt",
+    "calc.weighted.emissions.electricity.lrmer_low_re_cost_15_2023_start..co2e_mmt",
+    "calc.weighted.emissions.fuel_oil..co2e_mmt",
+    "calc.weighted.emissions.natural_gas..co2e_mmt",
+    "calc.weighted.emissions.propane..co2e_mmt",
+    "calc.weighted.emissions.total_with_cambium_mid_case_15y..co2e_mmt",
+    "calc.weighted.emissions.total_with_egrid..co2e_mmt",
+    "calc.weighted.enduse_group.electricity.hvac.emissions.egrid_2021_subregion..co2e_mmt",
+    "calc.weighted.enduse_group.electricity.interior_equipment.emissions.egrid_2021_subregion..co2e_mmt",
+    "calc.weighted.enduse_group.electricity.lighting.emissions.egrid_2021_subregion..co2e_mmt",
+    "calc.weighted.enduse_group.electricity.refrigeration.emissions.egrid_2021_subregion..co2e_mmt",
+    "calc.weighted.enduse_group.electricity.water_systems.emissions.egrid_2021_subregion..co2e_mmt",
+    "calc.weighted.enduse_group.natural_gas.hvac.emissions..co2e_mmt",
+    "calc.weighted.enduse_group.natural_gas.interior_equipment.emissions..co2e_mmt",
+    "calc.weighted.enduse_group.natural_gas.water_systems.emissions..co2e_mmt",
+    "calc.weighted.enduse_group.other_fuel.hvac.emissions..co2e_mmt",
+    "calc.weighted.enduse_group.other_fuel.interior_equipment.emissions..co2e_mmt",
+    "calc.weighted.enduse_group.other_fuel.water_systems.emissions..co2e_mmt",
+    "calc.weighted.enduse_group.site_energy.hvac.emissions..co2e_mmt",
+    "calc.weighted.enduse_group.site_energy.interior_equipment.emissions..co2e_mmt",
+    "calc.weighted.enduse_group.site_energy.lighting.emissions..co2e_mmt",
+    "calc.weighted.enduse_group.site_energy.refrigeration.emissions..co2e_mmt",
+    "calc.weighted.enduse_group.site_energy.water_systems.emissions..co2e_mmt",
+    "in.utility_bill_electricity_fixed_charges",
+    "in.utility_bill_electricity_marginal_rates",
+    "out.all_fuels.total.lrmer_high_re_cost_15.co2e_kg",
+    "out.all_fuels.total.lrmer_low_re_cost_15.co2e_kg",
+    "out.all_fuels.total.lrmer_mid_case_15.co2e_kg",
+    "out.all_fuels.total.lrmer_mid_case_25.co2e_kg",
+    "out.bills.all_fuels.usd",
+    "out.bills.electricity.usd",
+    "out.bills.fuel_oil.usd",
+    "out.bills.natural_gas.usd",
+    "out.bills.propane.usd",
+    "out.electricity.total.lrmer_high_re_cost_15.co2e_kg",
+    "out.electricity.total.lrmer_low_re_cost_15.co2e_kg",
+    "out.electricity.total.lrmer_mid_case_15.co2e_kg",
+    "out.electricity.total.lrmer_mid_case_25.co2e_kg",
+    "out.emissions.electricity.aer_95_decarb_by_2035_from_2023..co2e_kg",
+    "out.emissions.electricity.aer_95_decarb_by_2050_from_2023..co2e_kg",
+    "out.emissions.electricity.aer_high_re_cost_from_2023..co2e_kg",
+    "out.emissions.electricity.aer_low_re_cost_from_2023..co2e_kg",
+    "out.emissions.electricity.aer_mid_case_from_2023..co2e_kg",
+    "out.emissions.electricity.egrid_2018_state..co2e_kg",
+    "out.emissions.electricity.egrid_2018_subregion..co2e_kg",
+    "out.emissions.electricity.egrid_2019_state..co2e_kg",
+    "out.emissions.electricity.egrid_2019_subregion..co2e_kg",
+    "out.emissions.electricity.egrid_2020_state..co2e_kg",
+    "out.emissions.electricity.egrid_2020_subregion..co2e_kg",
+    "out.emissions.electricity.egrid_2021_state..co2e_kg",
+    "out.emissions.electricity.egrid_2021_subregion..co2e_kg",
+    "out.emissions.electricity.lrmer_95_decarb_by_2035_15_2023_start..co2e_kg",
+    "out.emissions.electricity.lrmer_95_decarb_by_2035_15_2025_start..co2e_kg",
+    "out.emissions.electricity.lrmer_95_decarb_by_2035_25_2025_start..co2e_kg",
+    "out.emissions.electricity.lrmer_95_decarb_by_2035_30_2023_start..co2e_kg",
+    "out.emissions.electricity.lrmer_95_decarb_by_2050_15_2023_start..co2e_kg",
+    "out.emissions.electricity.lrmer_95_decarb_by_2050_30_2023_start..co2e_kg",
+    "out.emissions.electricity.lrmer_high_re_cost_15_2023_start..co2e_kg",
+    "out.emissions.electricity.lrmer_high_re_cost_30_2023_start..co2e_kg",
+    "out.emissions.electricity.lrmer_low_re_cost_15_2023_start..co2e_kg",
+    "out.emissions.electricity.lrmer_low_re_cost_15_2025_start..co2e_kg",
+    "out.emissions.electricity.lrmer_low_re_cost_25_2025_start..co2e_kg",
+    "out.emissions.electricity.lrmer_low_re_cost_30_2023_start..co2e_kg",
+    "out.emissions.electricity.lrmer_mid_case_15_2023_start..co2e_kg",
+    "out.emissions.electricity.lrmer_mid_case_15_2025_start..co2e_kg",
+    "out.emissions.electricity.lrmer_mid_case_25_2025_start..co2e_kg",
+    "out.emissions.electricity.lrmer_mid_case_30_2023_start..co2e_kg",
+    "out.emissions.fuel_oil..co2e_kg",
+    "out.emissions.natural_gas..co2e_kg",
+    "out.emissions.propane..co2e_kg",
+    "out.fuel_oil.total.lrmer_high_re_cost_15.co2e_kg",
+    "out.fuel_oil.total.lrmer_low_re_cost_15.co2e_kg",
+    "out.fuel_oil.total.lrmer_mid_case_15.co2e_kg",
+    "out.fuel_oil.total.lrmer_mid_case_25.co2e_kg",
+    "out.natural_gas.total.lrmer_high_re_cost_15.co2e_kg",
+    "out.natural_gas.total.lrmer_low_re_cost_15.co2e_kg",
+    "out.natural_gas.total.lrmer_mid_case_15.co2e_kg",
+    "out.natural_gas.total.lrmer_mid_case_25.co2e_kg",
+    "out.propane.total.lrmer_high_re_cost_15.co2e_kg",
+    "out.propane.total.lrmer_low_re_cost_15.co2e_kg",
+    "out.propane.total.lrmer_mid_case_15.co2e_kg",
+    "out.propane.total.lrmer_mid_case_25.co2e_kg"
+  ],
+  "weights_found": {
+    "res": "weight",
+    "com": "weight"
+  },
+  "weather_alignment": "EPW hour-ending stamp t+1h joined to energy hour t",
+  "features": {
+    "rows_after_warmup": 42960000,
+    "warmup_rows": 840000,
+    "n_features": 20,
+    "features": [
+      "hour_sin",
+      "hour_cos",
+      "month_sin",
+      "month_cos",
+      "dayofweek",
+      "is_weekend",
+      "temperature_c",
+      "rel_humidity",
+      "solar_ghi_wm2",
+      "hdd",
+      "cdd",
+      "lag_1h",
+      "lag_24h",
+      "lag_168h",
+      "rolling_mean_24h",
+      "rolling_std_24h",
+      "is_holiday",
+      "zone_enc",
+      "is_commercial",
+      "floor_area_log"
+    ],
+    "target": "out.site_energy.total.energy_consumption"
+  },
+  "split_rows": {
+    "train": 18240000,
+    "val": 8064000,
+    "test": 8064000,
+    "oos": 2016000,
+    "buildings_dev": 4000,
+    "buildings_oos": 1000
+  },
+  "building_scale_kwh": {
+    "min": 0.0414182018927756,
+    "median": 4.161834440447325,
+    "max": 6665.265157599199
+  },
+  "climate": {
+    "deltas_vs_1995_2014": {
+      "SSP2-4.5 2021-2040": [
+        0.65,
+        0.35,
+        0.95
+      ],
+      "SSP2-4.5 2041-2060": [
+        1.15,
+        0.75,
+        1.65
+      ],
+      "SSP2-4.5 2081-2100": [
+        1.85,
+        1.25,
+        2.65
+      ],
+      "SSP5-8.5 2021-2040": [
+        0.75,
+        0.45,
+        1.05
+      ],
+      "SSP5-8.5 2041-2060": [
+        1.55,
+        1.05,
+        2.15
+      ],
+      "SSP5-8.5 2081-2100": [
+        3.55,
+        2.45,
+        4.85
+      ]
+    },
+    "model_trees": 1239,
+    "features": [
+      "hour_sin",
+      "hour_cos",
+      "month_sin",
+      "month_cos",
+      "dayofweek",
+      "is_weekend",
+      "is_holiday",
+      "temperature_c",
+      "rel_humidity",
+      "solar_ghi_wm2",
+      "hdd",
+      "cdd",
+      "is_commercial",
+      "floor_area_log",
+      "vintage_year",
+      "heat_gas",
+      "heat_elec",
+      "heat_oil_propane",
+      "heat_other",
+      "btype",
+      "hvac"
+    ],
+    "params": {
+      "max_depth": 10,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 5,
+      "reg_lambda": 1.0,
+      "enable_categorical": true,
+      "max_cat_to_onehot": 1
+    }
+  },
+  "energy_burden": {
+    "households_total": 3000,
+    "excluded_income_le0": 325,
+    "excluded_by_city": {
+      "Atlanta": 76,
+      "Baltimore": 115,
+      "Chicago": 52,
+      "Denver": 33,
+      "Houston": 49
+    },
+    "households_used": 2675,
+    "cost_source": "EIA SEDS 2018 residential prices by state and fuel (config.py)",
+    "site_energy_not_priced_pct": 0.0
+  },
+  "eda": {
+    "enduse_unmapped_pct": 0.001,
+    "eui_median_res": 161.2,
+    "eui_median_com": 227.8,
+    "area_median_res_m2": 112.1,
+    "area_median_com_m2": 1625.8,
+    "ef_electricity_kg_kwh": {
+      "2A": 0.4226,
+      "3A": 0.4662,
+      "4A": 0.3248,
+      "5A": 0.5289,
+      "5B": 0.5777
+    },
+    "ef_fuel_kg_kwh": {
+      "natural_gas": 0.18104823516016097,
+      "propane": 0.21452134460081643,
+      "fuel_oil": 0.2523619953344422,
+      "other_fuel": 0.2523619953344422
+    }
+  },
+  "esg_df": {
+    "df_definition": "sum of individual peaks / peak of the sum (hourly, sample)",
+    "df_range_all": [
+      1.275,
+      1.474
+    ],
+    "esg_rank_stable_across_weights": false,
+    "esg_weights_E": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "grid_ef_reduction_whatif": [
+      0.0,
+      0.25,
+      0.5,
+      0.75
+    ]
+  }
+}

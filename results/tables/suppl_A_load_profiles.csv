@@ -1,0 +1,11 @@
+﻿type,city,W_hpk,W_pk,W_min,S_hpk,S_pk,S_min
+residential,Houston,8,22.2,13.6,17,22.7,9.3
+residential,Atlanta,7,29.5,14.8,17,17.7,6.4
+residential,Baltimore,7,46.1,28.6,17,14.0,5.4
+residential,Chicago,8,59.2,44.9,18,14.8,6.1
+residential,Denver,9,50.1,25.9,19,14.5,4.8
+commercial,Houston,13,24.1,9.4,13,37.4,11.7
+commercial,Atlanta,8,29.8,16.8,12,37.7,15.8
+commercial,Baltimore,10,47.7,21.8,11,42.7,11.8
+commercial,Chicago,9,54.2,26.2,13,38.7,10.5
+commercial,Denver,10,41.1,25.8,13,32.5,11.2

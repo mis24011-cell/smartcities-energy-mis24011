@@ -1,0 +1,10 @@
+{
+ "residual_mean": 0.2538,
+ "residual_median": -0.056,
+ "q0.005": -45.5126,
+ "q0.995": 53.9102,
+ "share_abs_le_1kWh_%": 66.1283,
+ "share_abs_le_5kWh_%": 87.3697,
+ "se_share_commercial_%": 99.8308,
+ "se_share_top40_buildings_%": 68.8418
+}

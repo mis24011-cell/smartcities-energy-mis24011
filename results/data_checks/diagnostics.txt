@@ -1,0 +1,358 @@
+======================================================================
+00b_REPAIR_DATA — diagnostics & repair
+======================================================================
+
+[1] Original metadata: 5,000 rows
+    bldg_id collisions between ResStock/ComStock: 8
+OK   building_uid is unique
+OK   sample size = 5000
+
+[2] NREL national metadata
+  downloading s3://oedi-data-lake/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2024/resstock_amy2018_release_2/metadata/baseline.parquet ...
+    2024/resstock_amy2018_release_2: index name = bldg_id (00_DOWNLOAD used this index as bldg_id)
+  downloading s3://oedi-data-lake/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2023/comstock_amy2018_release_2/metadata/baseline.parquet ...
+    2023/comstock_amy2018_release_2: index name = bldg_id (00_DOWNLOAD used this index as bldg_id)
+    ResStock: 549,718 buildings, 340 columns
+    ComStock: 336,149 buildings, 706 columns
+    ResStock columns with 'sqft': ['in.sqft']
+    ResStock columns with 'floor_area': ['in.geometry_floor_area', 'in.geometry_floor_area_bin', 'out.params.floor_area_attic_ft_2', 'out.params.floor_area_attic_insulation_increase_ft_2_delta_r_value', 'out.params.floor_area_conditioned_infiltration_reduction_ft_2_delta_ach_50', 'out.params.floor_area_foundation_ft_2', 'out.params.floor_area_lighting_ft_2']
+    ResStock columns with 'weight': ['weight']
+    ResStock columns with 'emission': ['in.emissions_electricity_folders', 'in.emissions_electricity_units', 'in.emissions_electricity_values_or_filepaths', 'in.emissions_fossil_fuel_units', 'in.emissions_scenario_names', 'in.emissions_types', 'in.generation_and_emissions_assessment_region']
+    ResStock columns with 'bill': ['in.utility_bill_electricity_fixed_charges', 'in.utility_bill_electricity_marginal_rates', 'in.utility_bill_fuel_oil_fixed_charges', 'in.utility_bill_fuel_oil_marginal_rates', 'in.utility_bill_natural_gas_fixed_charges', 'in.utility_bill_natural_gas_marginal_rates', 'in.utility_bill_propane_fixed_charges', 'in.utility_bill_propane_marginal_rates', 'in.utility_bill_scenario_names', 'in.utility_bill_simple_filepaths', 'out.bills.all_fuels.usd', 'out.bills.electricity.usd', 'out.bills.fuel_oil.usd', 'out.bills.natural_gas.usd', 'out.bills.propane.usd']
+    ResStock columns with 'income': ['in.representative_income', 'in.area_median_income', 'in.income', 'in.income_recs_2015', 'in.income_recs_2020']
+    ComStock columns with 'sqft': ['in.sqft', 'calc.weighted.sqft']
+    ComStock columns with 'floor_area': ['in.floor_area_category']
+    ComStock columns with 'weight': ['weight', 'calc.weighted.sqft', 'out.params.boiler_cap_weight_efficiency', 'out.params.boiler_load_weight_efficiency', 'out.params.heat_pump_cooling_cap_weight_cop..cop', 'out.params.heat_pump_cooling_load_weight_cop..cop', 'out.params.heat_pump_heating_cap_weight_cop..cop', 'out.params.heat_pump_heating_load_weight_cop..cop', 'calc.weighted.district_cooling.cooling.energy_consumption..tbtu', 'calc.weighted.district_cooling.total.energy_consumption..tbtu', 'calc.weighted.district_heating.cooling.energy_consumption..tbtu', 'calc.weighted.district_heating.heating.energy_consumption..tbtu', 'calc.weighted.district_heating.total.energy_consumption..tbtu', 'calc.weighted.district_heating.water_systems.energy_consumption..tbtu', 'calc.weighted.electricity.cooling.energy_consumption..tbtu', 'calc.weighted.electricity.exterior_lighting.energy_consumption..tbtu', 'calc.weighted.electricity.fans.energy_consumption..tbtu', 'calc.weighted.electricity.heat_recovery.energy_consumption..tbtu', 'calc.weighted.electricity.heat_rejection.energy_consumption..tbtu', 'calc.weighted.electricity.heating.energy_consumption..tbtu', 'calc.weighted.electricity.interior_equipment.energy_consumption..tbtu', 'calc.weighted.electricity.interior_lighting.energy_consumption..tbtu', 'calc.weighted.electricity.pumps.energy_consumption..tbtu', 'calc.weighted.electricity.refrigeration.energy_consumption..tbtu', 'calc.weighted.electricity.total.energy_consumption..tbtu'] ...
+    ComStock columns with 'emission': ['out.emissions.electricity.aer_95_decarb_by_2035_from_2023..co2e_kg', 'out.emissions.electricity.aer_95_decarb_by_2050_from_2023..co2e_kg', 'out.emissions.electricity.aer_high_re_cost_from_2023..co2e_kg', 'out.emissions.electricity.aer_low_re_cost_from_2023..co2e_kg', 'out.emissions.electricity.aer_mid_case_from_2023..co2e_kg', 'out.emissions.electricity.egrid_2018_state..co2e_kg', 'out.emissions.electricity.egrid_2018_subregion..co2e_kg', 'out.emissions.electricity.egrid_2019_state..co2e_kg', 'out.emissions.electricity.egrid_2019_subregion..co2e_kg', 'out.emissions.electricity.egrid_2020_state..co2e_kg', 'out.emissions.electricity.egrid_2020_subregion..co2e_kg', 'out.emissions.electricity.egrid_2021_state..co2e_kg', 'out.emissions.electricity.egrid_2021_subregion..co2e_kg', 'out.emissions.electricity.lrmer_95_decarb_by_2035_15_2023_start..co2e_kg', 'out.emissions.electricity.lrmer_95_decarb_by_2035_15_2025_start..co2e_kg', 'out.emissions.electricity.lrmer_95_decarb_by_2035_25_2025_start..co2e_kg', 'out.emissions.electricity.lrmer_95_decarb_by_2035_30_2023_start..co2e_kg', 'out.emissions.electricity.lrmer_95_decarb_by_2050_15_2023_start..co2e_kg', 'out.emissions.electricity.lrmer_95_decarb_by_2050_30_2023_start..co2e_kg', 'out.emissions.electricity.lrmer_high_re_cost_15_2023_start..co2e_kg', 'out.emissions.electricity.lrmer_high_re_cost_30_2023_start..co2e_kg', 'out.emissions.electricity.lrmer_low_re_cost_15_2023_start..co2e_kg', 'out.emissions.electricity.lrmer_low_re_cost_15_2025_start..co2e_kg', 'out.emissions.electricity.lrmer_low_re_cost_25_2025_start..co2e_kg', 'out.emissions.electricity.lrmer_low_re_cost_30_2023_start..co2e_kg'] ...
+    ComStock columns with 'bill': []
+    ComStock columns with 'income': ['in.ejscreen_census_tract_percentile_for_low_income']
+    Houston   matched county codes: res {'G4802010': 6967} | com {'G4802010': 4862}
+    Houston   zone filter res=64,139 com=39,630 | +county res=6967 com=4862
+    Atlanta   matched county codes: res {'G1301210': 1856} | com {'G1301210': 1381}
+    Atlanta   zone filter res=73,609 com=47,472 | +county res=1856 com=1381
+    Baltimore matched county codes: res {'G2405100': 1226} | com {'G2405100': 1039}
+    Baltimore zone filter res=119,117 com=69,051 | +county res=1226 com=1039
+    Chicago   matched county codes: res {'G1700310': 8985} | com {'G1700310': 4982}
+    Chicago   zone filter res=124,668 com=76,703 | +county res=8985 com=4982
+    Denver    matched county codes: res {'G0800310': 1235} | com {'G0800310': 963}
+    Denver    zone filter res=20,960 com=13,499 | +county res=1235 com=963
+
+[3] Floor area
+OK   all sampled residential ids exist in ResStock metadata
+OK   all sampled commercial ids exist in ComStock metadata
+    numeric residential area candidates: ['in.sqft', 'out.params.floor_area_attic_ft_2', 'out.params.floor_area_attic_insulation_increase_ft_2_delta_r_value', 'out.params.floor_area_conditioned_infiltration_reduction_ft_2_delta_ach_50', 'out.params.floor_area_foundation_ft_2', 'out.params.floor_area_lighting_ft_2']
+    'in.sqft' inside its in.geometry_floor_area bin: 3000/3000
+OK   numeric area 'in.sqft' consistent with the categorical bin
+    residential area source: NREL numeric column 'in.sqft'
+OK   floor_area_m2 > 0 for all 5,000 buildings
+               count    mean     std   min    25%     50%     75%      max
+dataset_type                                                              
+commercial    2000.0  4424.6  7602.0  92.9  696.8  1625.8  6967.7  92903.0
+residential   3000.0   141.9   101.1  25.4   79.3   112.1   157.7    688.8
+
+[4] Weights / income / NREL emission & bill outputs
+    weight columns: res=weight com=weight
+               count    mean   std     min     25%     50%     75%     max
+dataset_type                                                              
+commercial    2000.0    4.51  2.74    1.89    1.89    3.33    7.69   11.25
+residential   3000.0  252.30  0.00  252.30  252.30  252.30  252.30  252.30
+    residential income <= 0 or missing: 325 (excluded in 04, not imputed)
+    distinct income values: 133
+    NREL vacancy column: in.vacancy_status
+    income<=0 × vacancy_status:
+income0         False  True 
+vacancy_status              
+Occupied         2675      0
+Vacant              0    325
+    income<=0 × tenure:
+income0        False  True 
+tenure                     
+Not Available      0    325
+Owner           1363      0
+Renter          1312      0
+    income<=0 per city:
+           sum  count
+city                 
+Atlanta     76    600
+Baltimore  115    600
+Chicago     52    600
+Denver      33    600
+Houston     49    600
+    numeric emission/bill columns stored: 85
+      calc.emissions.total_with_cambium_mid_case_15y..co2e_kg  [commercial]
+      calc.emissions.total_with_egrid..co2e_kg  [commercial]
+      calc.weighted.emissions.electricity.egrid_2021_subregion..co2e_mmt  [commercial]
+      calc.weighted.emissions.electricity.lrmer_high_re_cost_15_2023_start..co2e_mmt  [commercial]
+      calc.weighted.emissions.electricity.lrmer_low_re_cost_15_2023_start..co2e_mmt  [commercial]
+      calc.weighted.emissions.fuel_oil..co2e_mmt  [commercial]
+      calc.weighted.emissions.natural_gas..co2e_mmt  [commercial]
+      calc.weighted.emissions.propane..co2e_mmt  [commercial]
+      calc.weighted.emissions.total_with_cambium_mid_case_15y..co2e_mmt  [commercial]
+      calc.weighted.emissions.total_with_egrid..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.electricity.hvac.emissions.egrid_2021_subregion..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.electricity.interior_equipment.emissions.egrid_2021_subregion..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.electricity.lighting.emissions.egrid_2021_subregion..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.electricity.refrigeration.emissions.egrid_2021_subregion..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.electricity.water_systems.emissions.egrid_2021_subregion..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.natural_gas.hvac.emissions..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.natural_gas.interior_equipment.emissions..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.natural_gas.water_systems.emissions..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.other_fuel.hvac.emissions..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.other_fuel.interior_equipment.emissions..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.other_fuel.water_systems.emissions..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.site_energy.hvac.emissions..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.site_energy.interior_equipment.emissions..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.site_energy.lighting.emissions..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.site_energy.refrigeration.emissions..co2e_mmt  [commercial]
+      calc.weighted.enduse_group.site_energy.water_systems.emissions..co2e_mmt  [commercial]
+      in.utility_bill_electricity_fixed_charges  [residential]
+      in.utility_bill_electricity_marginal_rates  [residential]
+      out.all_fuels.total.lrmer_high_re_cost_15.co2e_kg  [residential]
+      out.all_fuels.total.lrmer_low_re_cost_15.co2e_kg  [residential]
+      out.all_fuels.total.lrmer_mid_case_15.co2e_kg  [residential]
+      out.all_fuels.total.lrmer_mid_case_25.co2e_kg  [residential]
+      out.bills.all_fuels.usd  [residential]
+      out.bills.electricity.usd  [residential]
+      out.bills.fuel_oil.usd  [residential]
+      out.bills.natural_gas.usd  [residential]
+      out.bills.propane.usd  [residential]
+      out.electricity.total.lrmer_high_re_cost_15.co2e_kg  [residential]
+      out.electricity.total.lrmer_low_re_cost_15.co2e_kg  [residential]
+      out.electricity.total.lrmer_mid_case_15.co2e_kg  [residential]
+      out.electricity.total.lrmer_mid_case_25.co2e_kg  [residential]
+      out.emissions.electricity.aer_95_decarb_by_2035_from_2023..co2e_kg  [commercial]
+      out.emissions.electricity.aer_95_decarb_by_2050_from_2023..co2e_kg  [commercial]
+      out.emissions.electricity.aer_high_re_cost_from_2023..co2e_kg  [commercial]
+      out.emissions.electricity.aer_low_re_cost_from_2023..co2e_kg  [commercial]
+      out.emissions.electricity.aer_mid_case_from_2023..co2e_kg  [commercial]
+      out.emissions.electricity.egrid_2018_state..co2e_kg  [commercial]
+      out.emissions.electricity.egrid_2018_subregion..co2e_kg  [commercial]
+      out.emissions.electricity.egrid_2019_state..co2e_kg  [commercial]
+      out.emissions.electricity.egrid_2019_subregion..co2e_kg  [commercial]
+      out.emissions.electricity.egrid_2020_state..co2e_kg  [commercial]
+      out.emissions.electricity.egrid_2020_subregion..co2e_kg  [commercial]
+      out.emissions.electricity.egrid_2021_state..co2e_kg  [commercial]
+      out.emissions.electricity.egrid_2021_subregion..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_95_decarb_by_2035_15_2023_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_95_decarb_by_2035_15_2025_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_95_decarb_by_2035_25_2025_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_95_decarb_by_2035_30_2023_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_95_decarb_by_2050_15_2023_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_95_decarb_by_2050_30_2023_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_high_re_cost_15_2023_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_high_re_cost_30_2023_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_low_re_cost_15_2023_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_low_re_cost_15_2025_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_low_re_cost_25_2025_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_low_re_cost_30_2023_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_mid_case_15_2023_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_mid_case_15_2025_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_mid_case_25_2025_start..co2e_kg  [commercial]
+      out.emissions.electricity.lrmer_mid_case_30_2023_start..co2e_kg  [commercial]
+      out.emissions.fuel_oil..co2e_kg  [commercial]
+      out.emissions.natural_gas..co2e_kg  [commercial]
+      out.emissions.propane..co2e_kg  [commercial]
+      out.fuel_oil.total.lrmer_high_re_cost_15.co2e_kg  [residential]
+      out.fuel_oil.total.lrmer_low_re_cost_15.co2e_kg  [residential]
+      out.fuel_oil.total.lrmer_mid_case_15.co2e_kg  [residential]
+      out.fuel_oil.total.lrmer_mid_case_25.co2e_kg  [residential]
+      out.natural_gas.total.lrmer_high_re_cost_15.co2e_kg  [residential]
+      out.natural_gas.total.lrmer_low_re_cost_15.co2e_kg  [residential]
+      out.natural_gas.total.lrmer_mid_case_15.co2e_kg  [residential]
+      out.natural_gas.total.lrmer_mid_case_25.co2e_kg  [residential]
+      out.propane.total.lrmer_high_re_cost_15.co2e_kg  [residential]
+      out.propane.total.lrmer_low_re_cost_15.co2e_kg  [residential]
+      out.propane.total.lrmer_mid_case_15.co2e_kg  [residential]
+      out.propane.total.lrmer_mid_case_25.co2e_kg  [residential]
+    sampled buildings per county code:
+city       dataset_type  county_code
+Atlanta    commercial    G1301210       400
+           residential   G1301210       600
+Baltimore  commercial    G2405100       400
+           residential   G2405100       600
+Chicago    commercial    G1700310       400
+           residential   G1700310       600
+Denver     commercial    G0800310       400
+           residential   G0800310       600
+Houston    commercial    G4802010       400
+           residential   G4802010       600
+
+    -> data\v2\metadata_v2.parquet
+
+[5] Timeseries repair
+    columns with '.kwh' suffix (ComStock naming) merged into un-suffixed: 0
+    site total column: out.site_energy.total.energy_consumption
+    fuel totals: {'electricity': 'out.electricity.total.energy_consumption', 'natural_gas': 'out.natural_gas.total.energy_consumption', 'propane': 'out.propane.total.energy_consumption', 'fuel_oil': 'out.fuel_oil.total.energy_consumption', 'other_fuel': 'out.other_fuel.total.energy_consumption', 'district_heating': 'out.district_heating.total.energy_consumption', 'district_cooling': 'out.district_cooling.total.energy_consumption'}
+    end-use columns mapped: 62 | unmatched: []
+      Ψύξη        <- out.district_cooling.cooling.energy_consumption
+      Ψύξη        <- out.district_heating.cooling.energy_consumption
+      Θέρμανση    <- out.district_heating.heating.energy_consumption
+      Ζ.Ν.Χ.      <- out.district_heating.water_systems.energy_consumption
+      Αερισμός    <- out.electricity.ceiling_fan.energy_consumption
+      Εξοπλισμός  <- out.electricity.clothes_dryer.energy_consumption
+      Εξοπλισμός  <- out.electricity.clothes_washer.energy_consumption
+      Ψύξη        <- out.electricity.cooling.energy_consumption
+      Ψύξη        <- out.electricity.cooling_fans_pumps.energy_consumption
+      Εξοπλισμός  <- out.electricity.dishwasher.energy_consumption
+      Φωτισμός    <- out.electricity.exterior_lighting.energy_consumption
+      Αερισμός    <- out.electricity.fans.energy_consumption
+      Εξοπλισμός  <- out.electricity.freezer.energy_consumption
+      Αερισμός    <- out.electricity.heat_recovery.energy_consumption
+      Ψύξη        <- out.electricity.heat_rejection.energy_consumption
+      Θέρμανση    <- out.electricity.heating.energy_consumption
+      Θέρμανση    <- out.electricity.heating_fans_pumps.energy_consumption
+      Θέρμανση    <- out.electricity.heating_hp_bkup.energy_consumption
+      Θέρμανση    <- out.electricity.heating_hp_bkup_fa.energy_consumption
+      Ζ.Ν.Χ.      <- out.electricity.hot_water.energy_consumption
+      Εξοπλισμός  <- out.electricity.interior_equipment.energy_consumption
+      Φωτισμός    <- out.electricity.interior_lighting.energy_consumption
+      Φωτισμός    <- out.electricity.lighting_exterior.energy_consumption
+      Φωτισμός    <- out.electricity.lighting_garage.energy_consumption
+      Φωτισμός    <- out.electricity.lighting_interior.energy_consumption
+      Αερισμός    <- out.electricity.mech_vent.energy_consumption
+      Εξοπλισμός  <- out.electricity.permanent_spa_heat.energy_consumption
+      Εξοπλισμός  <- out.electricity.permanent_spa_pump.energy_consumption
+      Εξοπλισμός  <- out.electricity.plug_loads.energy_consumption
+      Εξοπλισμός  <- out.electricity.pool_heater.energy_consumption
+      Εξοπλισμός  <- out.electricity.pool_pump.energy_consumption
+      Αερισμός    <- out.electricity.pumps.energy_consumption
+      Εξοπλισμός  <- out.electricity.range_oven.energy_consumption
+      Εξοπλισμός  <- out.electricity.refrigeration.energy_consumption
+      Εξοπλισμός  <- out.electricity.refrigerator.energy_consumption
+      Ζ.Ν.Χ.      <- out.electricity.water_systems.energy_consumption
+      Εξοπλισμός  <- out.electricity.well_pump.energy_consumption
+      Θέρμανση    <- out.fuel_oil.heating.energy_consumption
+      Θέρμανση    <- out.fuel_oil.heating_hp_bkup.energy_consumption
+      Ζ.Ν.Χ.      <- out.fuel_oil.hot_water.energy_consumption
+      Εξοπλισμός  <- out.natural_gas.clothes_dryer.energy_consumption
+      Ψύξη        <- out.natural_gas.cooling.energy_consumption
+      Θέρμανση    <- out.natural_gas.fireplace.energy_consumption
+      Εξοπλισμός  <- out.natural_gas.grill.energy_consumption
+      Θέρμανση    <- out.natural_gas.heating.energy_consumption
+      Θέρμανση    <- out.natural_gas.heating_hp_bkup.energy_consumption
+      Ζ.Ν.Χ.      <- out.natural_gas.hot_water.energy_consumption
+      Εξοπλισμός  <- out.natural_gas.interior_equipment.energy_consumption
+      Φωτισμός    <- out.natural_gas.lighting.energy_consumption
+      Εξοπλισμός  <- out.natural_gas.permanent_spa_heat.energy_consumption
+      Εξοπλισμός  <- out.natural_gas.pool_heater.energy_consumption
+      Εξοπλισμός  <- out.natural_gas.range_oven.energy_consumption
+      Ζ.Ν.Χ.      <- out.natural_gas.water_systems.energy_consumption
+      Ψύξη        <- out.other_fuel.cooling.energy_consumption
+      Θέρμανση    <- out.other_fuel.heating.energy_consumption
+      Εξοπλισμός  <- out.other_fuel.interior_equipment.energy_consumption
+      Ζ.Ν.Χ.      <- out.other_fuel.water_systems.energy_consumption
+      Εξοπλισμός  <- out.propane.clothes_dryer.energy_consumption
+      Θέρμανση    <- out.propane.heating.energy_consumption
+      Θέρμανση    <- out.propane.heating_hp_bkup.energy_consumption
+      Ζ.Ν.Χ.      <- out.propane.hot_water.energy_consumption
+      Εξοπλισμός  <- out.propane.range_oven.energy_consumption
+OK   weather: 8.760 unique hours per city
+OK   weather after shift spans 2018-01-01 00:00 … 2018-12-31 23:00
+OK   Houston/residential: 600/600 buildings × 8.760 h
+OK   Houston/residential: site total present every hour, weather joined
+    Houston   residential: hours with site energy = 0 -> total 8788, buildings with >24 such hours: 2, max per building 7689
+    Houston   residential: raw rows 5,256,000 -> 5,256,000 | site − Σfuels = 0.000%
+OK   Houston/commercial: 400/400 buildings × 8.760 h
+OK   Houston/commercial: site total present every hour, weather joined
+    Houston   commercial : hours with site energy = 0 -> total 0, buildings with >24 such hours: 0, max per building 0
+    Houston   commercial : raw rows 3,504,000 -> 3,504,000 | site − Σfuels = 0.000%
+OK   Atlanta/residential: 600/600 buildings × 8.760 h
+OK   Atlanta/residential: site total present every hour, weather joined
+    Atlanta   residential: hours with site energy = 0 -> total 2840, buildings with >24 such hours: 1, max per building 2840
+    Atlanta   residential: raw rows 5,256,000 -> 5,256,000 | site − Σfuels = 0.000%
+OK   Atlanta/commercial: 400/400 buildings × 8.760 h
+OK   Atlanta/commercial: site total present every hour, weather joined
+    Atlanta   commercial : hours with site energy = 0 -> total 0, buildings with >24 such hours: 0, max per building 0
+    Atlanta   commercial : raw rows 3,504,000 -> 3,504,000 | site − Σfuels = 0.000%
+OK   Baltimore/residential: 600/600 buildings × 8.760 h
+OK   Baltimore/residential: site total present every hour, weather joined
+    Baltimore residential: hours with site energy = 0 -> total 0, buildings with >24 such hours: 0, max per building 0
+    Baltimore residential: raw rows 5,256,000 -> 5,256,000 | site − Σfuels = 0.000%
+OK   Baltimore/commercial: 400/400 buildings × 8.760 h
+OK   Baltimore/commercial: site total present every hour, weather joined
+    Baltimore commercial : hours with site energy = 0 -> total 0, buildings with >24 such hours: 0, max per building 0
+    Baltimore commercial : raw rows 3,504,000 -> 3,504,000 | site − Σfuels = 0.000%
+OK   Chicago/residential: 600/600 buildings × 8.760 h
+OK   Chicago/residential: site total present every hour, weather joined
+    Chicago   residential: hours with site energy = 0 -> total 2190, buildings with >24 such hours: 1, max per building 2190
+    Chicago   residential: raw rows 5,256,000 -> 5,256,000 | site − Σfuels = 0.000%
+OK   Chicago/commercial: 400/400 buildings × 8.760 h
+OK   Chicago/commercial: site total present every hour, weather joined
+    Chicago   commercial : hours with site energy = 0 -> total 0, buildings with >24 such hours: 0, max per building 0
+    Chicago   commercial : raw rows 3,504,000 -> 3,504,000 | site − Σfuels = 0.000%
+OK   Denver/residential: 600/600 buildings × 8.760 h
+OK   Denver/residential: site total present every hour, weather joined
+    Denver    residential: hours with site energy = 0 -> total 4786, buildings with >24 such hours: 1, max per building 4786
+    Denver    residential: raw rows 5,256,000 -> 5,256,000 | site − Σfuels = 0.000%
+OK   Denver/commercial: 400/400 buildings × 8.760 h
+OK   Denver/commercial: site total present every hour, weather joined
+    Denver    commercial : hours with site energy = 0 -> total 0, buildings with >24 such hours: 0, max per building 0
+    Denver    commercial : raw rows 3,504,000 -> 3,504,000 | site − Σfuels = 0.000%
+
+[6] Data quality per building (before modelling)
+    thresholds: zero run ≥ 24 h, flat run ≥ 48 h, |robust z(log EUI)| > 3,5
+                          N  zero_hours  max_zero_run  gap_flags  flat_flags  negative_flags  eui_outliers  dup_rows  eui_median
+city      dataset_type                                                                                                          
+Atlanta   commercial    400           0             0          0           0               0             6         0       185.7
+          residential   600        2840           460          1           1               0            21         0       124.2
+Baltimore commercial    400           0             0          0           0               0             0         0       334.1
+          residential   600           0             0          0           0               3             7         0       190.1
+Chicago   commercial    400           0             0          0           0               0             0         0       324.9
+          residential   600        2190           103          1           0               0             7         0       242.8
+Denver    commercial    400           0             0          0           0               0             0         0       228.1
+          residential   600        4786            14          0           0               8            10         0       180.5
+Houston   commercial    400           0             0          0           0               0             5         0       150.9
+          residential   600        8788            17          0           0               1            13         0       126.1
+    worst 15 buildings (longest zero / flat runs):
+building_uid      city dataset_type  zero_h  max_zero_run  max_flat_run  neg_values  eui_kwh_m2  eui_robust_z
+     R177508   Atlanta  residential    2840           460            70           0        4.94         -6.65
+     R349641   Chicago  residential    2190           103             2           0      104.02         -1.72
+     R199945   Houston  residential    7689            17             0           0        6.31         -7.36
+      R65220    Denver  residential    4786            14             2           0       69.05         -1.84
+     R267190   Houston  residential    1099             2             2           0       48.61         -2.34
+     R275485   Houston  residential       0             0            14           0      135.16          0.17
+     C145311 Baltimore   commercial       0             0            14           0       70.13         -2.08
+     C145358 Baltimore   commercial       0             0            14           0      101.88         -1.59
+     C145428 Baltimore   commercial       0             0            14           0      249.95         -0.39
+     C145610 Baltimore   commercial       0             0            14           0       64.89         -2.19
+     C145671 Baltimore   commercial       0             0            14           0       79.68         -1.91
+     C145718 Baltimore   commercial       0             0            14           0       65.46         -2.18
+     C145754 Baltimore   commercial       0             0            14           0       82.15         -1.87
+     C145790 Baltimore   commercial       0             0            14           0      100.55         -1.60
+     C145814 Baltimore   commercial       0             0            14           0      122.57         -1.34
+    EUI median by vacancy status (residential):
+                 count   mean    std   min    50%    max
+vacancy_status                                          
+Occupied        2675.0  199.7  106.4  23.4  173.9  817.5
+Vacant           325.0   69.6   47.8   4.8   57.1  234.7
+    buildings with a technical flag (gap / flat / negative): 14 -> decision before STEP B
+OK   total rows = 5,000 × 8.760 = 43,800,000
+    -> data\v2\buildings_v2.parquet
+
+✓ STEP A finished. Please send data/v2/diagnostics.txt before STEP B.
+[7] Completeness check: Σ hourly (ours) vs NREL annual site energy
+    NREL columns: res=out.site_energy.total.energy_consumption | com=out.site_energy.total.energy_consumption
+    median ratio ours / NREL by type (≈1 expected; a constant ≠1 = unit difference): {'commercial': 1.0002, 'residential': 1.0}
+    tolerance: |Σ ours − NREL annual| > 1.0 % -> incomplete
+                          N  missing_nrel  median_abs_diff_pct  max_abs_diff_pct  flagged
+city      dataset_type                                                                   
+Atlanta   commercial    400             0               0.0079            0.0517        0
+          residential   600             0               0.0007            0.4524        0
+Baltimore commercial    400             0               0.0232            0.0518        0
+          residential   600             0               0.0006            0.0515        0
+Chicago   commercial    400             0               0.0293            0.0553        0
+          residential   600             0               0.0004            0.0822        0
+Denver    commercial    400             0               0.0220            0.0518        0
+          residential   600             0               0.0008            0.1262        0
+Houston   commercial    400             0               0.0023            0.0511        0
+          residential   600             0               0.0007            0.0674        0
+    buildings flagged (incomplete or long zero run): 2
+building_uid    city dataset_type vacancy_status  ours_kwh  nrel_kwh  diff_pct  zero_h  max_zero_run
+     R177508 Atlanta  residential         Vacant    391.81    393.59     -0.45    2840           460
+     R349641 Chicago  residential         Vacant   6020.71   6020.85     -0.00    2190           103
+    -> data\v2\annual_check.csv
+    negative values in 12 buildings, by column (hours):
+out.electricity.pv.energy_consumption     55721
+out.electricity.net.energy_consumption    20271
+out.site_energy.net.energy_consumption    11906
+    is the site total ever negative? False
