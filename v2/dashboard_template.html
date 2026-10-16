@@ -1,0 +1,400 @@
+<title>Ενεργειακή Κονσόλα Πόλεων</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Commissioner:wght@500;650;750&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: control bar on top, then a 2-column grid of instrument panels (1 column on phones);
+   every panel = question it answers + chart + one-line reading. Summary table closes the page. */
+:root{
+  --bg:#f3f5f7; --panel:#ffffff; --ink:#141a22; --ink-2:#4a5563; --ink-3:#6b7684; --rule:#dde2e8;
+  --accent:#2f43a8; --accent-soft:#e6e9f7; --bar:#5c6b7d; --ghost:#c9d1db;
+  --res:#2a78d6; --com:#eb6834; --e:#1baf7a; --s:#eda100;
+  --q1:#184f95; --q2:#3987e5; --q3:#6da7ec; --q4:#9ec5f4;
+  --warn:#b45309; --crit:#b42318;
+  --f-display:"Commissioner","IBM Plex Sans",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1116; --panel:#161b23; --ink:#eef1f5; --ink-2:#b6bfca; --ink-3:#8b96a3; --rule:#2a313c;
+  --accent:#8e9cf0; --accent-soft:#232a45; --bar:#93a2b4; --ghost:#3a4350;
+  --res:#3987e5; --com:#d95926; --e:#199e70; --s:#c98500;
+  --q1:#6da7ec; --q2:#3987e5; --q3:#256abf; --q4:#184f95;
+  --warn:#f0a35c; --crit:#f27b72; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1116; --panel:#161b23; --ink:#eef1f5; --ink-2:#b6bfca; --ink-3:#8b96a3; --rule:#2a313c;
+  --accent:#8e9cf0; --accent-soft:#232a45; --bar:#93a2b4; --ghost:#3a4350;
+  --res:#3987e5; --com:#d95926; --e:#199e70; --s:#c98500;
+  --q1:#6da7ec; --q2:#3987e5; --q3:#256abf; --q4:#184f95;
+  --warn:#f0a35c; --crit:#f27b72; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 48px;display:grid;gap:18px}
+header{display:grid;gap:6px}
+.eyebrow{font:500 12px/1.3 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+h1{font:750 clamp(26px,3.4vw,36px)/1.1 var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+.lede{color:var(--ink-2);max-width:72ch;margin:0}
+.controls{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-start;background:var(--panel);
+  border:1px solid var(--rule);border-radius:10px;padding:14px 18px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.ctl{display:grid;gap:4px;min-width:0}
+.ctl label,.ctl .lbl{font:600 12px/1.2 var(--f-body);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.ctl .val{font:500 15px var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.ctl input[type=range]{width:220px;max-width:70vw;accent-color:var(--accent)}
+.ctl .hint{font-size:12px;line-height:1.35;color:var(--ink-3);max-width:240px}
+@media (max-width:860px){.controls{position:static}}
+.seg{display:inline-flex;justify-self:start;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.seg button{font:500 13px var(--f-body);background:transparent;color:var(--ink-2);border:0;padding:6px 11px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#0e1116}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#0e1116}}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.summary{background:var(--accent-soft);border-radius:10px;padding:12px 16px;color:var(--ink);max-width:none}
+.summary b{font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px 14px;display:grid;gap:8px;min-width:0}
+.panel h2{font:650 17px/1.25 var(--f-display);margin:0;text-wrap:balance}
+.panel .q{color:var(--ink-3);font-size:13px;margin:0}
+.panel .read{color:var(--ink-2);font-size:13.5px;margin:0;border-top:1px solid var(--rule);padding-top:8px}
+.src{font:400 11.5px var(--f-mono);color:var(--ink-3)}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{fill:var(--ink-2);font-family:var(--f-body);font-size:12px}
+svg .num{paint-order:stroke;stroke:var(--panel);stroke-width:3px;stroke-linejoin:round;font-family:var(--f-mono);font-size:11.5px;fill:var(--ink);font-variant-numeric:tabular-nums}
+svg .city{fill:var(--ink);font-weight:500}
+svg .axis{stroke:var(--rule)} svg .zero{stroke:var(--ink-3)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--ink-2)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-2px}
+.legend .mk{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px;border:2px solid var(--ink)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 10px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap}
+th{font:600 12px var(--f-body);color:var(--ink-3);text-transform:uppercase;letter-spacing:.03em}
+th:first-child,td:first-child{text-align:left}
+td.mono{font-family:var(--f-mono);font-size:13px}
+.pill{display:inline-block;font:600 11px var(--f-mono);padding:2px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.pill.tie{background:transparent;border:1px dashed var(--accent)}
+.ok{color:var(--ink-2)} .hi{color:var(--warn);font-weight:600} .sev{color:var(--crit);font-weight:600}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--panel);font:12.5px/1.4 var(--f-body);
+  padding:7px 9px;border-radius:6px;max-width:260px;opacity:0;transition:opacity .08s;z-index:20}
+footer{color:var(--ink-3);font-size:12.5px;display:grid;gap:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">MIS24011 · NREL ResStock 2024 R2 + ComStock 2023 R2 · έτος 2018 · 5.000 κτίρια</div>
+    <h1>Ενεργειακή Κονσόλα Πόλεων</h1>
+    <p class="lede">Επίπεδο παρουσίασης του συστήματος υποστήριξης αποφάσεων της διπλωματικής. Άλλαξε το βάρος του περιβάλλοντος, τη μείωση του συντελεστή εκπομπών του δικτύου και το κλιματικό σενάριο· όλοι οι δείκτες υπολογίζονται ξανά με τους τύπους της εργασίας. Αναλυτική εξήγηση κάθε ρύθμισης: Παράρτημα Α της εργασίας.</p>
+  </header>
+
+  <section class="controls" aria-label="Ρυθμίσεις σεναρίου">
+    <div class="ctl">
+      <label for="wE">Βάρος E στον δείκτη E+S</label>
+      <input id="wE" type="range" min="0" max="1" step="0.05" value="0.5">
+      <span class="val" id="wEv"></span>
+      <span class="hint">Πόση σημασία δίνεις στις εκπομπές CO₂ (E) έναντι της ενεργειακής φτώχειας (S): 0 = μόνο S, 1 = μόνο E.</span>
+    </div>
+    <div class="ctl">
+      <label for="ef">Μείωση συντελεστή δικτύου</label>
+      <input id="ef" type="range" min="0" max="0.75" step="0.05" value="0">
+      <span class="val" id="efv"></span>
+      <span class="hint">Πόσο λιγότερο CO₂ ανά kWh εκπέμπει το ηλεκτρικό δίκτυο σε σχέση με το 2018· η κατανάλωση και η καύση αερίου μένουν ίδιες.</span>
+    </div>
+    <div class="ctl">
+      <span class="lbl" id="sspL">Σενάριο IPCC</span>
+      <div class="seg" role="group" aria-labelledby="sspL" id="ssp"></div>
+      <span class="hint">Πορεία παγκόσμιων εκπομπών: SSP2-4.5 μεσαία, SSP5-8.5 πολύ υψηλή.</span>
+    </div>
+    <div class="ctl">
+      <span class="lbl" id="perL">Περίοδος</span>
+      <div class="seg" role="group" aria-labelledby="perL" id="per"></div>
+      <span class="hint" id="perv"></span>
+    </div>
+  </section>
+
+  <p class="summary" id="summary" aria-live="polite"></p>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>Κατάταξη σύνθετου δείκτη E+S</h2>
+      <p class="q">Ποια πόλη συνδυάζει χαμηλές εκπομπές ανά m² με χαμηλή ενεργειακή επιβάρυνση των φτωχότερων νοικοκυριών;</p>
+      <div class="legend"><span><i style="background:var(--e)"></i>E · εκπομπές CO₂/m² αποθέματος</span><span><i style="background:var(--s)"></i>S · διάμεση επιβάρυνση Q1</span></div>
+      <svg id="chRank" viewBox="0 0 520 230" role="img" aria-label="Κατάταξη πόλεων στον δείκτη E+S"></svg>
+      <p class="read" id="rdRank"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Εκπομπές CO₂ ανά m² αποθέματος</h2>
+      <p class="q">Πόσο μειώνονται οι εκπομπές κάθε πόλης αν καθαρίσει το ηλεκτρικό δίκτυο (κατανάλωση 2018 σταθερή);</p>
+      <div class="legend"><span><i style="background:var(--bar)"></i>με τη μείωση που επιλέχθηκε</span><span><i style="background:var(--ghost)"></i>2018 (eGRID2018)</span></div>
+      <svg id="chCo2" viewBox="0 0 520 240" role="img" aria-label="Εκπομπές CO₂ ανά m² ανά πόλη"></svg>
+      <p class="read" id="rdCo2"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Επίδραση του κλίματος στην κατανάλωση</h2>
+      <p class="q">Πώς αλλάζει η ετήσια κατανάλωση οικιστικών και εμπορικών κτιρίων με τη θερμοκρασία του σεναρίου;</p>
+      <div class="legend"><span><i style="background:var(--res)"></i>Οικιστικά</span><span><i style="background:var(--com)"></i>Εμπορικά</span><span>γραμμή = εύρος very likely του IPCC</span></div>
+      <svg id="chClim" viewBox="0 0 520 300" role="img" aria-label="Μεταβολή κατανάλωσης ανά πόλη και τύπο"></svg>
+      <p class="read" id="rdClim"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Ενεργειακή επιβάρυνση νοικοκυριών</h2>
+      <p class="q">Τι ποσοστό του εισοδήματος πληρώνει για ενέργεια το διάμεσο νοικοκυριό κάθε τεταρτημορίου;</p>
+      <div class="legend"><span><i style="background:var(--q1)"></i>Q1 φτωχότερο 25 %</span><span><i style="background:var(--q2)"></i>Q2</span><span><i style="background:var(--q3)"></i>Q3</span><span><i style="background:var(--q4)"></i>Q4</span></div>
+      <svg id="chBur" viewBox="0 0 520 260" role="img" aria-label="Διάμεση ενεργειακή επιβάρυνση ανά τεταρτημόριο"></svg>
+      <p class="read" id="rdBur"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Αξιοπιστία της ωριαίας πρόβλεψης</h2>
+      <p class="q">Πόσο καλύτερα από την «προηγούμενη ώρα» προβλέπει κάθε μοντέλο; Οι γραμμές είναι διαστήματα 95 % (bootstrap ανά κτίριο).</p>
+      <div class="legend"><span><span class="mk" style="background:var(--ink)"></span>Πόλεις ελέγχου 2A–5A</span><span><span class="mk" style="background:var(--panel)"></span>Denver 5B, εκτός εκπαίδευσης</span></div>
+      <svg id="chSkill" viewBox="0 0 520 190" role="img" aria-label="Skill μοντέλων με διαστήματα εμπιστοσύνης"></svg>
+      <p class="read" id="rdSkill"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Αιχμή και ετεροχρονισμός</h2>
+      <p class="q">Πόσο μικρότερη είναι η αιχμή της πόλης από το άθροισμα των ατομικών αιχμών, και πότε συμβαίνει;</p>
+      <div class="tablewrap"><table id="tbDf"></table></div>
+      <p class="read">DF = Σ ατομικών αιχμών / αιχμή του συνόλου, σταθμισμένο με το απόθεμα κάθε κομητείας. DF 1,37 σημαίνει ότι το δίκτυο βλέπει αιχμή 27 % μικρότερη από το άθροισμα (1 − 1/DF).</p>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Πίνακας σύνοψης με τις τρέχουσες ρυθμίσεις</h2>
+    <div class="tablewrap"><table id="tbSum"></table></div>
+  </section>
+
+  <footer>
+    <div>Πηγές: NREL ResStock/ComStock (μοντέλα προσομοίωσης EnergyPlus)· U.S. EPA eGRID2018 και GHG Emission Factors Hub· U.S. EIA SEDS 2018· IPCC AR6 WGI, Πίνακας SPM.1. Οι τιμές προέρχονται από τα αρχεία outputs_v2/tables της εργασίας (09_DASHBOARD_v2.py).</div>
+    <div>Η μείωση του συντελεστή δικτύου είναι παραδοχή για ανάλυση ευαισθησίας, όχι πρόβλεψη. Τα κλιματικά σενάρια κρατούν σταθερά τα κτίρια του 2018.</div>
+    <div>Συνοδευτικό υλικό της διπλωματικής εργασίας MIS24011 (Πανεπιστήμιο Μακεδονίας, ΔΠΜΣ στα Πληροφοριακά Συστήματα)· περιγραφή στο Κεφ. 6 §6.2.2 και οδηγός χρήσης στο Παράρτημα Α.</div>
+  </footer>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const D = /*__DATA__*/null;
+const $ = s => document.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const f = (x, d = 1) => x.toLocaleString("el-GR", {minimumFractionDigits: d, maximumFractionDigits: d});
+const sg = (x, d = 1) => (x > 0 ? "+" : x < 0 ? "−" : "") + f(Math.abs(x), d);
+const CITIES = D.cities.map(c => c.name);
+const Z = Object.fromEntries(D.cities.map(c => [c.name, c.zone]));
+const st = {w: 0.5, r: 0, ssp: "SSP5-8.5", per: "2081-2100"};
+
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function txt(parent, x, y, s, attrs = {}) { const t = el("text", {x, y, ...attrs}, parent); t.textContent = s; return t; }
+function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+
+// ── model, same formulas as the thesis ──────────────────────────────
+// CO₂(r) is exactly linear in r (Ch.5 §5.1.3). At the table steps 0/25/50/75 % the published values
+// of Table 5.6 are used as they are; between steps, linear interpolation (exact for a linear relation).
+function co2(city, r) {
+  const s = D.grid[city].all.steps, k = Math.min(2, Math.floor(r / 0.25 + 1e-9)), t = (r - 0.25 * k) / 0.25;
+  return s[k] + (s[k + 1] - s[k]) * t;
+}
+function minmaxBestLow(obj) {
+  const v = Object.values(obj), mx = Math.max(...v), mn = Math.min(...v);
+  return Object.fromEntries(Object.entries(obj).map(([k, x]) => [k, mx === mn ? 100 : 100 * (mx - x) / (mx - mn)]));
+}
+function composite() {
+  const E = Object.fromEntries(CITIES.map(c => [c, co2(c, st.r)]));
+  const S = Object.fromEntries(CITIES.map(c => [c, D.esg[c].S]));
+  const Es = minmaxBestLow(E), Ss = minmaxBestLow(S);
+  const rows = CITIES.map(c => {
+    const score = Math.round((st.w * Es[c] + (1 - st.w) * Ss[c]) * 1e6) / 1e6;   // round before ranking (ties)
+    return {c, E: E[c], S: S[c], Es: Es[c], Ss: Ss[c], score};
+  });
+  rows.forEach(r => { r.rank = 1 + rows.filter(o => o.score > r.score).length;
+                      r.tie = rows.filter(o => o.score === r.score).length > 1; });
+  return rows.sort((a, b) => a.rank - b.rank || a.c.localeCompare(b.c));
+}
+const scen = () => `${st.ssp} ${st.per}`;
+
+// ── panels ──────────────────────────────────────────────────────────
+function drawRank(rows) {
+  const svg = $("#chRank"); clear(svg);
+  const x0 = 150, W = 300, rowH = 42, y0 = 14;
+  [0, 25, 50, 75, 100].forEach(v => {
+    const x = x0 + W * v / 100; el("line", {x1: x, x2: x, y1: y0 - 4, y2: y0 + rowH * 5 - 8, class: "axis"}, svg);
+    txt(svg, x, y0 + rowH * 5 + 6, f(v, 0), {"text-anchor": "middle"});
+  });
+  rows.forEach((r, i) => {
+    const y = y0 + i * rowH;
+    txt(svg, 0, y + 15, `${r.rank}${r.tie ? "=" : ""}`, {class: "num", "font-weight": "600"});
+    txt(svg, 26, y + 15, r.c, {class: "city"});
+    txt(svg, 26, y + 30, `ζώνη ${Z[r.c]}`, {"font-size": "11"});
+    const we = W * st.w * r.Es / 100, ws = W * (1 - st.w) * r.Ss / 100;
+    const tip = `${r.c}: σύνθετος ${f(r.score)} · E ${f(r.E, 2)} kg/m² (βαθμός ${f(r.Es, 0)}) · S ${f(r.S, 2)} % (βαθμός ${f(r.Ss, 0)})`;
+    if (we > 0.5) el("rect", {x: x0, y: y + 6, width: Math.max(we - 1, 0), height: 22, rx: 3, fill: "var(--e)", "data-tip": tip}, svg);
+    if (ws > 0.5) el("rect", {x: x0 + we + (we > 0.5 ? 1 : 0), y: y + 6, width: Math.max(ws - 1, 0), height: 22, rx: 3, fill: "var(--s)", "data-tip": tip}, svg);
+    txt(svg, x0 + we + ws + 8, y + 22, f(r.score), {class: "num"});
+  });
+  const top = rows.filter(r => r.rank === 1).map(r => r.c).join(" & ");
+  const ties = rows.filter(r => r.tie);
+  $("#rdRank").textContent = `Με w_E = ${f(st.w, 2)} πρώτη είναι ${top === "" ? "—" : "η πόλη " + top}.` +
+    (ties.length ? ` Ισοβαθμία: ${[...new Set(ties.map(t => t.c))].join(", ")} (${f(ties[0].score)}).` : "") +
+    " Η κατάταξη εξαρτάται από το βάρος· στην εργασία εξετάζονται τα 0,25 / 0,50 / 0,75 (Κεφ. 4, §4.5.2).";
+}
+
+function drawCo2() {
+  const svg = $("#chCo2"); clear(svg);
+  const x0 = 120, W = 330, rowH = 42, y0 = 14, mx = 80;
+  [0, 20, 40, 60, 80].forEach(v => {
+    const x = x0 + W * v / mx; el("line", {x1: x, x2: x, y1: y0 - 4, y2: y0 + rowH * 5 - 8, class: "axis"}, svg);
+    txt(svg, x, y0 + rowH * 5 + 6, f(v, 0), {"text-anchor": "middle"});
+  });
+  txt(svg, x0 + W / 2, y0 + rowH * 5 + 22, "kg CO₂ / m² · έτος", {"text-anchor": "middle", "font-size": "11"});
+  CITIES.forEach((c, i) => {
+    const y = y0 + i * rowH, base = co2(c, 0), now = co2(c, st.r), sh = D.grid[c].all.share;
+    txt(svg, 0, y + 15, c, {class: "city"});
+    txt(svg, 0, y + 30, `ηλεκτρισμός ${f(sh * 100, 0)} %`, {"font-size": "11"});
+    const tip = `${c}: ${f(base, 2)} → ${f(now, 2)} kg/m² (${sg(-sh * st.r * 100)} %) · ηλεκτρισμός ${f(sh * 100, 1)} % των εκπομπών`;
+    el("rect", {x: x0, y: y + 6, width: W * base / mx, height: 22, rx: 3, fill: "var(--ghost)", "data-tip": tip}, svg);
+    el("rect", {x: x0, y: y + 10, width: W * now / mx, height: 14, rx: 3, fill: "var(--bar)", "data-tip": tip}, svg);
+    txt(svg, x0 + W * base / mx + 8, y + 22, st.r > 0 ? `${f(now)} (${sg(-sh * st.r * 100)} %)` : f(now), {class: "num"});
+  });
+  const s = CITIES.map(c => [c, co2(c, st.r)]).sort((a, b) => a[1] - b[1]);
+  $("#rdCo2").textContent = st.r === 0
+    ? `Σήμερα τις χαμηλότερες εκπομπές έχει η ${s[0][0]} (${f(s[0][1])} kg/m²) και τις υψηλότερες το ${s[4][0]} (${f(s[4][1])}). Μετακίνησε τη μείωση του δικτύου για να δεις πώς αλλάζει η σειρά.`
+    : `Με μείωση ${f(st.r * 100, 0)} %: χαμηλότερες εκπομπές ${s[0][0]} (${f(s[0][1])}), υψηλότερες ${s[4][0]} (${f(s[4][1])}). Ωφελούνται περισσότερο οι πόλεις όπου ο ηλεκτρισμός κυριαρχεί στις εκπομπές.`;
+}
+
+function drawClim() {
+  const svg = $("#chClim"); clear(svg);
+  let lo = 0, hi = 0;
+  CITIES.forEach(c => ["res", "com"].forEach(k => D.scenarios.forEach(s => {
+    lo = Math.min(lo, D.climate[c][k][s].lo); hi = Math.max(hi, D.climate[c][k][s].hi); })));
+  lo = Math.floor(lo / 5) * 5; hi = Math.ceil(hi / 5) * 5;
+  const x0 = 120, W = 360, X = v => x0 + W * (v - lo) / (hi - lo), rowH = 54, y0 = 12;
+  for (let v = lo; v <= hi; v += 5) {
+    el("line", {x1: X(v), x2: X(v), y1: y0 - 4, y2: y0 + rowH * 5 - 6, class: v === 0 ? "zero" : "axis"}, svg);
+    txt(svg, X(v), y0 + rowH * 5 + 8, (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v), {"text-anchor": "middle"});
+  }
+  txt(svg, x0 + W, y0 + rowH * 5 + 22, "% μεταβολή έναντι 2018", {"text-anchor": "end", "font-size": "11"});
+  const s = scen();
+  CITIES.forEach((c, i) => {
+    const y = y0 + i * rowH;
+    txt(svg, 0, y + 20, c, {class: "city"}); txt(svg, 0, y + 35, `ζώνη ${Z[c]}`, {"font-size": "11"});
+    [["res", "var(--res)", "Οικιστικά", 4], ["com", "var(--com)", "Εμπορικά", 24]].forEach(([k, col, lab, dy]) => {
+      const d = D.climate[c][k][s], a = Math.min(X(0), X(d.v)), w = Math.abs(X(d.v) - X(0));
+      const tip = `${c} · ${lab}: ${sg(d.v)} % (εύρος ${sg(d.lo)} … ${sg(d.hi)} %) · ${s.replace(" ", " · ")}`;
+      el("rect", {x: a, y: y + dy, width: Math.max(w, 1.5), height: 16, rx: 3, fill: col, "data-tip": tip}, svg);
+      el("line", {x1: X(d.lo), x2: X(d.hi), y1: y + dy + 8, y2: y + dy + 8, stroke: "var(--ink)", "stroke-width": 1.5}, svg);
+      const tx = d.v >= 0 ? Math.max(X(d.v), X(d.hi)) + 6 : Math.min(X(d.v), X(d.lo)) - 6;
+      txt(svg, tx, y + dy + 12.5, sg(d.v), {class: "num", "text-anchor": d.v >= 0 ? "start" : "end"});
+    });
+  });
+  const dT = D.deltaT[s];
+  const r = CITIES.map(c => [c, D.climate[c].res[s].v]).sort((a, b) => a[1] - b[1]);
+  $("#rdClim").textContent = `ΔT ${sg(dT[0], 2)} °C (εύρος ${sg(dT[1], 2)} … ${sg(dT[2], 2)}) έναντι 1995–2014. Οικιστικά: μεγαλύτερη μείωση στο ${r[0][0]} (${sg(r[0][1])} %), ` +
+    `${r[4][1] > 0 ? "αύξηση" : "μικρότερη μεταβολή"} στο ${r[4][0]} (${sg(r[4][1])} %). Στις ψυχρές πόλεις κερδίζει η μείωση της θέρμανσης, στο Houston η αύξηση της ψύξης.`;
+}
+
+function drawBur() {
+  const svg = $("#chBur"); clear(svg);
+  const x0 = 34, W = 400, H = 170, y0 = 10, mx = 22, Y = v => y0 + H * (1 - v / mx);
+  [0, 5, 10, 15, 20].forEach(v => { el("line", {x1: x0, x2: x0 + W, y1: Y(v), y2: Y(v), class: "axis"}, svg);
+    txt(svg, x0 - 6, Y(v) + 4, f(v, 0), {"text-anchor": "end"}); });
+  [[6, "var(--warn)", "υψηλή 6 %"], [10, "var(--crit)", "σοβαρή 10 %"]].forEach(([v, col, lab]) => {
+    el("line", {x1: x0, x2: x0 + W, y1: Y(v), y2: Y(v), stroke: col, "stroke-dasharray": "5 4", "stroke-width": 1.4}, svg);
+    txt(svg, x0 + W + 6, Y(v) + 4, lab, {"font-size": "11", fill: col});
+  });
+  const gw = W / 5, bw = 14, gap = 2, qs = ["Q1", "Q2", "Q3", "Q4"], cols = ["var(--q1)", "var(--q2)", "var(--q3)", "var(--q4)"];
+  CITIES.forEach((c, i) => {
+    const gx = x0 + gw * i + (gw - (4 * bw + 3 * gap)) / 2;
+    qs.forEach((q, j) => {
+      const b = D.burden[c][q], x = gx + j * (bw + gap);
+      const tip = `${c} · ${q}: διάμεση επιβάρυνση ${f(b.med, 2)} % · εισόδημα $${f(b.inc, 0)} · κόστος $${f(b.cost, 0)}/έτος · ${f(b.hi6)} % > 6 % · N = ${b.n}`;
+      el("rect", {x, y: Y(b.med), width: bw, height: Y(0) - Y(b.med), rx: 3, fill: cols[j], "data-tip": tip}, svg);
+    });
+    txt(svg, gx - 1, Y(D.burden[c].Q1.med) - 6, f(D.burden[c].Q1.med), {class: "num"});
+    txt(svg, x0 + gw * i + gw / 2, Y(0) + 18, c, {"text-anchor": "middle", class: "city"});
+    txt(svg, x0 + gw * i + gw / 2, Y(0) + 33, `${f(D.burden[c].Q1.hi6, 0)} %`, {"text-anchor": "middle", "font-size": "11"});
+  });
+  txt(svg, x0, y0 + 4, "% εισοδήματος", {"font-size": "11"});
+  txt(svg, x0 + W / 2, Y(0) + 50, "κάτω από κάθε πόλη: % του Q1 με επιβάρυνση > 6 %", {"text-anchor": "middle", "font-size": "11"});
+  $("#rdBur").textContent = "Η επιβάρυνση εξαρτάται κυρίως από το εισόδημα και την ποιότητα της κατοικίας: στο Q4 είναι 1–2 % σε όλες τις πόλεις, στο Q1 φτάνει το 19,9 % στη Baltimore (54 % του Q1 με εισόδημα < $10.000). Δεν αλλάζει με τις ρυθμίσεις.";
+}
+
+function drawSkill() {
+  const svg = $("#chSkill"); clear(svg);
+  const models = ["Ridge Regression", "Random Forest", "XGBoost"], x0 = 130, W = 340, X = v => x0 + W * v / 0.5, y0 = 12, rowH = 48;
+  [0, 0.1, 0.2, 0.3, 0.4, 0.5].forEach(v => { el("line", {x1: X(v), x2: X(v), y1: y0 - 4, y2: y0 + rowH * 3 - 6, class: v === 0 ? "zero" : "axis"}, svg);
+    txt(svg, X(v), y0 + rowH * 3 + 8, f(v, 1), {"text-anchor": "middle"}); });
+  txt(svg, x0 + W, y0 + rowH * 3 + 22, "skill = 1 − RMSE μοντέλου / RMSE persistence", {"text-anchor": "end", "font-size": "11"});
+  models.forEach((m, i) => {
+    const y = y0 + i * rowH;
+    txt(svg, 0, y + 22, m.replace(" Regression", ""), {class: "city"});
+    [["test", 12, "var(--ink)", "πόλεις ελέγχου"], ["oos", 30, "var(--panel)", "Denver (εκτός εκπαίδευσης)"]].forEach(([set, dy, fill, lab]) => {
+      const s = D.skill.find(o => o.set === set && o.model === m);
+      el("line", {x1: X(s.lo), x2: X(s.hi), y1: y + dy, y2: y + dy, stroke: "var(--ink-2)", "stroke-width": 2}, svg);
+      [s.lo, s.hi].forEach(v => el("line", {x1: X(v), x2: X(v), y1: y + dy - 4, y2: y + dy + 4, stroke: "var(--ink-2)", "stroke-width": 1.5}, svg));
+      el("circle", {cx: X(s.v), cy: y + dy, r: 5.5, fill, stroke: "var(--ink)", "stroke-width": 2,
+        "data-tip": `${m} · ${lab}: skill ${f(s.v, 3)} (95 %: ${f(s.lo, 3)} … ${f(s.hi, 3)}) · RMSE ${f(D.rmse[set][m], 2)} kWh/h`}, svg);
+      txt(svg, X(s.hi) + 8, y + dy + 4, f(s.v, 3), {class: "num"});
+    });
+  });
+  $("#rdSkill").textContent = "Στις πόλεις ελέγχου το XGBoost είναι σαφώς καλύτερο (διαστήματα χωρίς επικάλυψη). Στο Denver τα διαστήματα του XGBoost και του Random Forest επικαλύπτονται: η διαφορά τους δεν είναι στατιστικά σημαντική (p = 0,13), ενώ όλα τα μοντέλα παραμένουν καλύτερα από το persistence.";
+}
+
+function drawDf() {
+  const t = $("#tbDf");
+  const hh = s => { const d = new Date(s.replace(" ", "T")); return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:00`; };
+  t.innerHTML = "<thead><tr><th>Πόλη</th><th>Οικιστικά</th><th>Εμπορικά</th><th>Σύνολο πόλης</th><th>Αιχμή συνόλου</th><th>Συντ. φορτίου</th></tr></thead><tbody>" +
+    CITIES.map(c => { const d = D.df[c]; return `<tr><td>${c} <span class="src">${Z[c]}</span></td><td class="mono">${f(d.res.df, 2)}</td><td class="mono">${f(d.com.df, 2)}</td><td class="mono"><b>${f(d.all.df, 2)}</b></td><td class="mono">${hh(d.all.peak)}</td><td class="mono">${f(d.all.lf, 2)}</td></tr>`; }).join("") + "</tbody>";
+}
+
+function drawSum(rows) {
+  const s = scen(), byC = Object.fromEntries(rows.map(r => [r.c, r]));
+  const cls = v => v > 10 ? "sev" : v > 6 ? "hi" : "ok";
+  $("#tbSum").innerHTML = `<thead><tr><th>Πόλη</th><th>Θέση E+S</th><th>Σύνθετος</th><th>CO₂ kg/m²</th><th>Επιβάρυνση Q1</th><th>Οικ. ${s.split(" ")[0]} ${s.split(" ")[1].replace("-", "–")}</th><th>Εμπ.</th><th>DF πόλης</th></tr></thead><tbody>` +
+    CITIES.map(c => { const r = byC[c]; return `<tr><td>${c} <span class="src">${Z[c]}</span></td><td><span class="pill${r.tie ? " tie" : ""}">${r.rank}${r.tie ? "=" : ""}</span></td><td class="mono">${f(r.score)}</td><td class="mono">${f(r.E, 2)}</td><td class="mono ${cls(r.S)}">${f(r.S, 2)} %</td><td class="mono">${sg(D.climate[c].res[s].v)} %</td><td class="mono">${sg(D.climate[c].com[s].v)} %</td><td class="mono">${f(D.df[c].all.df, 2)}</td></tr>`; }).join("") + "</tbody>";
+}
+
+function render() {
+  $("#wEv").textContent = `w_E = ${f(st.w, 2)} · w_S = ${f(1 - st.w, 2)}`;
+  $("#efv").textContent = st.r === 0 ? "0 % (δίκτυο 2018)" : `−${f(st.r * 100, 0)} %`;
+  { const d = D.deltaT[scen()];
+    $("#perv").textContent = `Θέρμανση του πλανήτη ΔT ${sg(d[0], 2)} °C (εύρος ${sg(d[1], 2)} … ${sg(d[2], 2)}) έναντι 1995–2014· τα κτίρια μένουν του 2018.`; }
+  const rows = composite();
+  drawRank(rows); drawCo2(); drawClim(); drawSum(rows);
+  const top = rows.filter(r => r.rank === 1).map(r => r.c).join(" & ");
+  const s = scen(), hot = CITIES.filter(c => D.climate[c].res[s].v > 0);
+  $("#summary").innerHTML = `Με <b>βάρος περιβάλλοντος ${f(st.w, 2)}</b> και <b>δίκτυο ${st.r === 0 ? "2018" : "−" + f(st.r * 100, 0) + " %"}</b>, πρώτη στον δείκτη E+S είναι η <b>${top}</b>. ` +
+    `Στο <b>${st.ssp}, ${st.per.replace("-", "–")}</b> η οικιστική κατανάλωση ${hot.length ? "αυξάνεται μόνο στ" + (hot.length === 1 ? "ο " : "ις ") + hot.join(", ") : "μειώνεται σε όλες τις πόλεις"}· η σοβαρότερη ενεργειακή φτώχεια παραμένει στη Baltimore.`;
+}
+
+function seg(id, opts, key) {
+  const box = $(id);
+  opts.forEach(([v, lab]) => { const b = document.createElement("button"); b.type = "button"; b.textContent = lab; b.id = `${id.slice(1)}-${v}`;
+    b.setAttribute("aria-pressed", String(st[key] === v));
+    b.addEventListener("click", () => { st[key] = v; box.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); render(); });
+    box.appendChild(b); });
+}
+seg("#ssp", [["SSP2-4.5", "SSP2-4.5"], ["SSP5-8.5", "SSP5-8.5"]], "ssp");
+seg("#per", [["2021-2040", "2021–40"], ["2041-2060", "2041–60"], ["2081-2100", "2081–2100"]], "per");
+$("#wE").addEventListener("input", e => { st.w = +e.target.value; render(); });
+$("#ef").addEventListener("input", e => { st.r = +e.target.value; render(); });
+
+// tooltip
+const tip = $("#tip");
+document.addEventListener("pointermove", e => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (!t) { tip.style.opacity = 0; return; }
+  tip.textContent = t.getAttribute("data-tip"); tip.style.opacity = 1;
+  const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+  tip.style.left = x + "px"; tip.style.top = (e.clientY + 16) + "px";
+});
+
+drawBur(); drawSkill(); drawDf(); render();
+</script>

@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ενεργειακή Κονσόλα Πόλεων</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Commissioner:wght@500;650;750&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: control bar on top, then a 2-column grid of instrument panels (1 column on phones);
+   every panel = question it answers + chart + one-line reading. Summary table closes the page. */
+:root{
+  --bg:#f3f5f7; --panel:#ffffff; --ink:#141a22; --ink-2:#4a5563; --ink-3:#6b7684; --rule:#dde2e8;
+  --accent:#2f43a8; --accent-soft:#e6e9f7; --bar:#5c6b7d; --ghost:#c9d1db;
+  --res:#2a78d6; --com:#eb6834; --e:#1baf7a; --s:#eda100;
+  --q1:#184f95; --q2:#3987e5; --q3:#6da7ec; --q4:#9ec5f4;
+  --warn:#b45309; --crit:#b42318;
+  --f-display:"Commissioner","IBM Plex Sans",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1116; --panel:#161b23; --ink:#eef1f5; --ink-2:#b6bfca; --ink-3:#8b96a3; --rule:#2a313c;
+  --accent:#8e9cf0; --accent-soft:#232a45; --bar:#93a2b4; --ghost:#3a4350;
+  --res:#3987e5; --com:#d95926; --e:#199e70; --s:#c98500;
+  --q1:#6da7ec; --q2:#3987e5; --q3:#256abf; --q4:#184f95;
+  --warn:#f0a35c; --crit:#f27b72; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1116; --panel:#161b23; --ink:#eef1f5; --ink-2:#b6bfca; --ink-3:#8b96a3; --rule:#2a313c;
+  --accent:#8e9cf0; --accent-soft:#232a45; --bar:#93a2b4; --ghost:#3a4350;
+  --res:#3987e5; --com:#d95926; --e:#199e70; --s:#c98500;
+  --q1:#6da7ec; --q2:#3987e5; --q3:#256abf; --q4:#184f95;
+  --warn:#f0a35c; --crit:#f27b72; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 48px;display:grid;gap:18px}
+header{display:grid;gap:6px}
+.eyebrow{font:500 12px/1.3 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+h1{font:750 clamp(26px,3.4vw,36px)/1.1 var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+.lede{color:var(--ink-2);max-width:72ch;margin:0}
+.controls{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-start;background:var(--panel);
+  border:1px solid var(--rule);border-radius:10px;padding:14px 18px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.ctl{display:grid;gap:4px;min-width:0}
+.ctl label,.ctl .lbl{font:600 12px/1.2 var(--f-body);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.ctl .val{font:500 15px var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.ctl input[type=range]{width:220px;max-width:70vw;accent-color:var(--accent)}
+.ctl .hint{font-size:12px;line-height:1.35;color:var(--ink-3);max-width:240px}
+@media (max-width:860px){.controls{position:static}}
+.seg{display:inline-flex;justify-self:start;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.seg button{font:500 13px var(--f-body);background:transparent;color:var(--ink-2);border:0;padding:6px 11px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#0e1116}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#0e1116}}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.summary{background:var(--accent-soft);border-radius:10px;padding:12px 16px;color:var(--ink);max-width:none}
+.summary b{font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px 14px;display:grid;gap:8px;min-width:0}
+.panel h2{font:650 17px/1.25 var(--f-display);margin:0;text-wrap:balance}
+.panel .q{color:var(--ink-3);font-size:13px;margin:0}
+.panel .read{color:var(--ink-2);font-size:13.5px;margin:0;border-top:1px solid var(--rule);padding-top:8px}
+.src{font:400 11.5px var(--f-mono);color:var(--ink-3)}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{fill:var(--ink-2);font-family:var(--f-body);font-size:12px}
+svg .num{paint-order:stroke;stroke:var(--panel);stroke-width:3px;stroke-linejoin:round;font-family:var(--f-mono);font-size:11.5px;fill:var(--ink);font-variant-numeric:tabular-nums}
+svg .city{fill:var(--ink);font-weight:500}
+svg .axis{stroke:var(--rule)} svg .zero{stroke:var(--ink-3)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--ink-2)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-2px}
+.legend .mk{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px;border:2px solid var(--ink)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 10px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap}
+th{font:600 12px var(--f-body);color:var(--ink-3);text-transform:uppercase;letter-spacing:.03em}
+th:first-child,td:first-child{text-align:left}
+td.mono{font-family:var(--f-mono);font-size:13px}
+.pill{display:inline-block;font:600 11px var(--f-mono);padding:2px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.pill.tie{background:transparent;border:1px dashed var(--accent)}
+.ok{color:var(--ink-2)} .hi{color:var(--warn);font-weight:600} .sev{color:var(--crit);font-weight:600}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--panel);font:12.5px/1.4 var(--f-body);
+  padding:7px 9px;border-radius:6px;max-width:260px;opacity:0;transition:opacity .08s;z-index:20}
+footer{color:var(--ink-3);font-size:12.5px;display:grid;gap:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">MIS24011 · NREL ResStock 2024 R2 + ComStock 2023 R2 · έτος 2018 · 5.000 κτίρια</div>
+    <h1>Ενεργειακή Κονσόλα Πόλεων</h1>
+    <p class="lede">Επίπεδο παρουσίασης του συστήματος υποστήριξης αποφάσεων της διπλωματικής. Άλλαξε το βάρος του περιβάλλοντος, τη μείωση του συντελεστή εκπομπών του δικτύου και το κλιματικό σενάριο· όλοι οι δείκτες υπολογίζονται ξανά με τους τύπους της εργασίας. Αναλυτική εξήγηση κάθε ρύθμισης: Παράρτημα Α της εργασίας.</p>
+  </header>
+
+  <section class="controls" aria-label="Ρυθμίσεις σεναρίου">
+    <div class="ctl">
+      <label for="wE">Βάρος E στον δείκτη E+S</label>
+      <input id="wE" type="range" min="0" max="1" step="0.05" value="0.5">
+      <span class="val" id="wEv"></span>
+      <span class="hint">Πόση σημασία δίνεις στις εκπομπές CO₂ (E) έναντι της ενεργειακής φτώχειας (S): 0 = μόνο S, 1 = μόνο E.</span>
+    </div>
+    <div class="ctl">
+      <label for="ef">Μείωση συντελεστή δικτύου</label>
+      <input id="ef" type="range" min="0" max="0.75" step="0.05" value="0">
+      <span class="val" id="efv"></span>
+      <span class="hint">Πόσο λιγότερο CO₂ ανά kWh εκπέμπει το ηλεκτρικό δίκτυο σε σχέση με το 2018· η κατανάλωση και η καύση αερίου μένουν ίδιες.</span>
+    </div>
+    <div class="ctl">
+      <span class="lbl" id="sspL">Σενάριο IPCC</span>
+      <div class="seg" role="group" aria-labelledby="sspL" id="ssp"></div>
+      <span class="hint">Πορεία παγκόσμιων εκπομπών: SSP2-4.5 μεσαία, SSP5-8.5 πολύ υψηλή.</span>
+    </div>
+    <div class="ctl">
+      <span class="lbl" id="perL">Περίοδος</span>
+      <div class="seg" role="group" aria-labelledby="perL" id="per"></div>
+      <span class="hint" id="perv"></span>
+    </div>
+  </section>
+
+  <p class="summary" id="summary" aria-live="polite"></p>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>Κατάταξη σύνθετου δείκτη E+S</h2>
+      <p class="q">Ποια πόλη συνδυάζει χαμηλές εκπομπές ανά m² με χαμηλή ενεργειακή επιβάρυνση των φτωχότερων νοικοκυριών;</p>
+      <div class="legend"><span><i style="background:var(--e)"></i>E · εκπομπές CO₂/m² αποθέματος</span><span><i style="background:var(--s)"></i>S · διάμεση επιβάρυνση Q1</span></div>
+      <svg id="chRank" viewBox="0 0 520 230" role="img" aria-label="Κατάταξη πόλεων στον δείκτη E+S"></svg>
+      <p class="read" id="rdRank"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Εκπομπές CO₂ ανά m² αποθέματος</h2>
+      <p class="q">Πόσο μειώνονται οι εκπομπές κάθε πόλης αν καθαρίσει το ηλεκτρικό δίκτυο (κατανάλωση 2018 σταθερή);</p>
+      <div class="legend"><span><i style="background:var(--bar)"></i>με τη μείωση που επιλέχθηκε</span><span><i style="background:var(--ghost)"></i>2018 (eGRID2018)</span></div>
+      <svg id="chCo2" viewBox="0 0 520 240" role="img" aria-label="Εκπομπές CO₂ ανά m² ανά πόλη"></svg>
+      <p class="read" id="rdCo2"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Επίδραση του κλίματος στην κατανάλωση</h2>
+      <p class="q">Πώς αλλάζει η ετήσια κατανάλωση οικιστικών και εμπορικών κτιρίων με τη θερμοκρασία του σεναρίου;</p>
+      <div class="legend"><span><i style="background:var(--res)"></i>Οικιστικά</span><span><i style="background:var(--com)"></i>Εμπορικά</span><span>γραμμή = εύρος very likely του IPCC</span></div>
+      <svg id="chClim" viewBox="0 0 520 300" role="img" aria-label="Μεταβολή κατανάλωσης ανά πόλη και τύπο"></svg>
+      <p class="read" id="rdClim"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Ενεργειακή επιβάρυνση νοικοκυριών</h2>
+      <p class="q">Τι ποσοστό του εισοδήματος πληρώνει για ενέργεια το διάμεσο νοικοκυριό κάθε τεταρτημορίου;</p>
+      <div class="legend"><span><i style="background:var(--q1)"></i>Q1 φτωχότερο 25 %</span><span><i style="background:var(--q2)"></i>Q2</span><span><i style="background:var(--q3)"></i>Q3</span><span><i style="background:var(--q4)"></i>Q4</span></div>
+      <svg id="chBur" viewBox="0 0 520 260" role="img" aria-label="Διάμεση ενεργειακή επιβάρυνση ανά τεταρτημόριο"></svg>
+      <p class="read" id="rdBur"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Αξιοπιστία της ωριαίας πρόβλεψης</h2>
+      <p class="q">Πόσο καλύτερα από την «προηγούμενη ώρα» προβλέπει κάθε μοντέλο; Οι γραμμές είναι διαστήματα 95 % (bootstrap ανά κτίριο).</p>
+      <div class="legend"><span><span class="mk" style="background:var(--ink)"></span>Πόλεις ελέγχου 2A–5A</span><span><span class="mk" style="background:var(--panel)"></span>Denver 5B, εκτός εκπαίδευσης</span></div>
+      <svg id="chSkill" viewBox="0 0 520 190" role="img" aria-label="Skill μοντέλων με διαστήματα εμπιστοσύνης"></svg>
+      <p class="read" id="rdSkill"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Αιχμή και ετεροχρονισμός</h2>
+      <p class="q">Πόσο μικρότερη είναι η αιχμή της πόλης από το άθροισμα των ατομικών αιχμών, και πότε συμβαίνει;</p>
+      <div class="tablewrap"><table id="tbDf"></table></div>
+      <p class="read">DF = Σ ατομικών αιχμών / αιχμή του συνόλου, σταθμισμένο με το απόθεμα κάθε κομητείας. DF 1,37 σημαίνει ότι το δίκτυο βλέπει αιχμή 27 % μικρότερη από το άθροισμα (1 − 1/DF).</p>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Πίνακας σύνοψης με τις τρέχουσες ρυθμίσεις</h2>
+    <div class="tablewrap"><table id="tbSum"></table></div>
+  </section>
+
+  <footer>
+    <div>Πηγές: NREL ResStock/ComStock (μοντέλα προσομοίωσης EnergyPlus)· U.S. EPA eGRID2018 και GHG Emission Factors Hub· U.S. EIA SEDS 2018· IPCC AR6 WGI, Πίνακας SPM.1. Οι τιμές προέρχονται από τα αρχεία outputs_v2/tables της εργασίας (09_DASHBOARD_v2.py).</div>
+    <div>Η μείωση του συντελεστή δικτύου είναι παραδοχή για ανάλυση ευαισθησίας, όχι πρόβλεψη. Τα κλιματικά σενάρια κρατούν σταθερά τα κτίρια του 2018.</div>
+    <div>Συνοδευτικό υλικό της διπλωματικής εργασίας MIS24011 (Πανεπιστήμιο Μακεδονίας, ΔΠΜΣ στα Πληροφοριακά Συστήματα)· περιγραφή στο Κεφ. 6 §6.2.2 και οδηγός χρήσης στο Παράρτημα Α.</div>
+  </footer>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const D = {"cities":[{"name":"Houston","zone":"2A"},{"name":"Atlanta","zone":"3A"},{"name":"Baltimore","zone":"4A"},{"name":"Chicago","zone":"5A"},{"name":"Denver","zone":"5B"}],"scenarios":["SSP2-4.5 2021-2040","SSP2-4.5 2041-2060","SSP2-4.5 2081-2100","SSP5-8.5 2021-2040","SSP5-8.5 2041-2060","SSP5-8.5 2081-2100"],"deltaT":{"SSP2-4.5 2021-2040":[0.65,0.35,0.95],"SSP2-4.5 2041-2060":[1.15,0.75,1.65],"SSP2-4.5 2081-2100":[1.85,1.25,2.65],"SSP5-8.5 2021-2040":[0.75,0.45,1.05],"SSP5-8.5 2041-2060":[1.55,1.05,2.15],"SSP5-8.5 2081-2100":[3.55,2.45,4.85]},"esg":{"Houston":{"E":51.12,"S":9.23},"Atlanta":{"E":56.47,"S":8.6},"Baltimore":{"E":47.97,"S":19.91},"Chicago":{"E":71.03,"S":10.53},"Denver":{"E":71.82,"S":5.83}},"grid":{"Houston":{"res":{"co2":44.46,"share":0.8798920377867747,"steps":[44.46,34.68,24.9,15.12]},"com":{"co2":69.73,"share":0.942492470959415,"steps":[69.73,53.3,36.87,20.44]},"all":{"co2":51.12,"share":0.9021909233176839,"steps":[51.12,39.59,28.06,16.53]}},"Atlanta":{"res":{"co2":43.58,"share":0.7878231604711641,"steps":[43.58,34.99,26.41,17.83]},"com":{"co2":75.62,"share":0.9537159481618619,"steps":[75.62,57.59,39.56,21.53]},"all":{"co2":56.47,"share":0.8773980284516852,"steps":[56.47,44.09,31.7,19.31]}},"Baltimore":{"res":{"co2":41.9,"share":0.5365155131264917,"steps":[41.9,36.28,30.66,25.04]},"com":{"co2":67.18,"share":0.7911084648208793,"steps":[67.18,53.89,40.61,27.32]},"all":{"co2":47.97,"share":0.622055451323744,"steps":[47.97,40.51,33.05,25.59]}},"Chicago":{"res":{"co2":64.53,"share":0.502505294694974,"steps":[64.53,56.42,48.31,40.21]},"com":{"co2":96.02,"share":0.8071929459140457,"steps":[96.02,76.64,57.26,37.89]},"all":{"co2":71.03,"share":0.5875451687080577,"steps":[71.03,60.59,50.16,39.73]}},"Denver":{"res":{"co2":59.76,"share":0.6463632307005801,"steps":[59.76,50.1,40.45,30.79]},"com":{"co2":99.04,"share":0.8815293484114163,"steps":[99.04,77.22,55.39,33.56]},"all":{"co2":71.82,"share":0.7459389213775178,"steps":[71.82,58.43,45.04,31.64]}}},"climate":{"Houston":{"res":{"SSP2-4.5 2021-2040":{"v":-0.23,"lo":-0.45,"hi":0.17},"SSP2-4.5 2041-2060":{"v":0.52,"lo":-0.07,"hi":1.24},"SSP2-4.5 2081-2100":{"v":1.57,"lo":0.72,"hi":2.96},"SSP5-8.5 2021-2040":{"v":-0.07,"lo":-0.26,"hi":0.33},"SSP5-8.5 2041-2060":{"v":1.04,"lo":0.33,"hi":1.96},"SSP5-8.5 2081-2100":{"v":4.78,"lo":2.55,"hi":8.17}},"com":{"SSP2-4.5 2021-2040":{"v":1.28,"lo":0.65,"hi":2.03},"SSP2-4.5 2041-2060":{"v":2.6,"lo":1.52,"hi":3.73},"SSP2-4.5 2081-2100":{"v":4.27,"lo":2.82,"hi":6.33},"SSP5-8.5 2021-2040":{"v":1.52,"lo":0.89,"hi":2.22},"SSP5-8.5 2041-2060":{"v":3.49,"lo":2.22,"hi":4.97},"SSP5-8.5 2081-2100":{"v":8.65,"lo":5.76,"hi":12.28}}},"Atlanta":{"res":{"SSP2-4.5 2021-2040":{"v":-0.86,"lo":-1.27,"hi":-0.34},"SSP2-4.5 2041-2060":{"v":-1.51,"lo":-2.33,"hi":-1.1},"SSP2-4.5 2081-2100":{"v":-2.5,"lo":-3.22,"hi":-1.7},"SSP5-8.5 2021-2040":{"v":-1.1,"lo":-1.43,"hi":-0.58},"SSP5-8.5 2041-2060":{"v":-2.19,"lo":-2.78,"hi":-1.43},"SSP5-8.5 2081-2100":{"v":-3.54,"lo":-3.2,"hi":-3.02}},"com":{"SSP2-4.5 2021-2040":{"v":0.81,"lo":0.45,"hi":1.21},"SSP2-4.5 2041-2060":{"v":1.5,"lo":0.9,"hi":2.17},"SSP2-4.5 2081-2100":{"v":2.51,"lo":1.63,"hi":3.77},"SSP5-8.5 2021-2040":{"v":0.9,"lo":0.54,"hi":1.35},"SSP5-8.5 2041-2060":{"v":2.02,"lo":1.35,"hi":2.98},"SSP5-8.5 2081-2100":{"v":5.51,"lo":3.45,"hi":8.43}}},"Baltimore":{"res":{"SSP2-4.5 2021-2040":{"v":-4.09,"lo":-5.3,"hi":-2.76},"SSP2-4.5 2041-2060":{"v":-6.15,"lo":-7.8,"hi":-4.36},"SSP2-4.5 2081-2100":{"v":-8.77,"lo":-11.28,"hi":-6.42},"SSP5-8.5 2021-2040":{"v":-4.36,"lo":-5.62,"hi":-3.0},"SSP5-8.5 2041-2060":{"v":-7.6,"lo":-9.76,"hi":-5.62},"SSP5-8.5 2081-2100":{"v":-13.9,"lo":-16.77,"hi":-10.64}},"com":{"SSP2-4.5 2021-2040":{"v":-0.77,"lo":-0.85,"hi":-0.61},"SSP2-4.5 2041-2060":{"v":-0.91,"lo":-0.92,"hi":-0.75},"SSP2-4.5 2081-2100":{"v":-0.98,"lo":-0.9,"hi":-0.76},"SSP5-8.5 2021-2040":{"v":-0.75,"lo":-0.88,"hi":-0.59},"SSP5-8.5 2041-2060":{"v":-0.97,"lo":-0.94,"hi":-0.88},"SSP5-8.5 2081-2100":{"v":-0.38,"lo":-0.85,"hi":0.84}}},"Chicago":{"res":{"SSP2-4.5 2021-2040":{"v":-4.07,"lo":-5.27,"hi":-2.79},"SSP2-4.5 2041-2060":{"v":-6.18,"lo":-7.9,"hi":-4.34},"SSP2-4.5 2081-2100":{"v":-8.85,"lo":-11.85,"hi":-6.42},"SSP5-8.5 2021-2040":{"v":-4.34,"lo":-5.61,"hi":-3.12},"SSP5-8.5 2041-2060":{"v":-7.7,"lo":-10.02,"hi":-5.61},"SSP5-8.5 2081-2100":{"v":-14.88,"lo":-18.87,"hi":-11.06}},"com":{"SSP2-4.5 2021-2040":{"v":-1.34,"lo":-1.75,"hi":-0.94},"SSP2-4.5 2041-2060":{"v":-2.03,"lo":-2.58,"hi":-1.39},"SSP2-4.5 2081-2100":{"v":-2.86,"lo":-3.69,"hi":-2.09},"SSP5-8.5 2021-2040":{"v":-1.39,"lo":-1.86,"hi":-1.0},"SSP5-8.5 2041-2060":{"v":-2.53,"lo":-3.21,"hi":-1.86},"SSP5-8.5 2081-2100":{"v":-4.47,"lo":-5.02,"hi":-3.5}}},"Denver":{"res":{"SSP2-4.5 2021-2040":{"v":-1.8,"lo":-2.66,"hi":-0.78},"SSP2-4.5 2041-2060":{"v":-3.43,"lo":-4.85,"hi":-2.04},"SSP2-4.5 2081-2100":{"v":-5.89,"lo":-8.72,"hi":-3.65},"SSP5-8.5 2021-2040":{"v":-2.04,"lo":-3.03,"hi":-1.04},"SSP5-8.5 2041-2060":{"v":-4.73,"lo":-7.0,"hi":-3.03},"SSP5-8.5 2081-2100":{"v":-11.95,"lo":-15.99,"hi":-7.93}},"com":{"SSP2-4.5 2021-2040":{"v":-0.67,"lo":-0.95,"hi":-0.31},"SSP2-4.5 2041-2060":{"v":-1.22,"lo":-1.63,"hi":-0.75},"SSP2-4.5 2081-2100":{"v":-1.98,"lo":-2.83,"hi":-1.25},"SSP5-8.5 2021-2040":{"v":-0.75,"lo":-1.1,"hi":-0.42},"SSP5-8.5 2041-2060":{"v":-1.61,"lo":-2.34,"hi":-1.1},"SSP5-8.5 2081-2100":{"v":-3.75,"lo":-4.63,"hi":-2.61}}}},"burden":{"Houston":{"Q1":{"med":9.23,"hi6":70.3,"hi10":48.6,"inc":16639.0,"cost":1276.0,"n":138},"Q2":{"med":3.33,"hi6":13.0,"hi10":0.0,"inc":42426.0,"cost":1368.0,"n":138},"Q3":{"med":2.21,"hi6":2.2,"hi10":0.0,"inc":89096.0,"cost":1823.0,"n":137},"Q4":{"med":1.41,"hi6":0.0,"hi10":0.0,"inc":149501.0,"cost":2247.0,"n":138}},"Atlanta":{"Q1":{"med":8.6,"hi6":64.9,"hi10":45.0,"inc":16639.0,"cost":1243.0,"n":131},"Q2":{"med":2.59,"hi6":3.8,"hi10":0.0,"inc":54023.0,"cost":1280.0,"n":131},"Q3":{"med":1.61,"hi6":1.5,"hi10":0.0,"inc":92315.0,"cost":1503.0,"n":131},"Q4":{"med":1.01,"hi6":0.0,"hi10":0.0,"inc":267342.0,"cost":2433.0,"n":131}},"Baltimore":{"Q1":{"med":19.91,"hi6":95.1,"hi10":84.4,"inc":4849.0,"cost":1480.0,"n":122},"Q2":{"med":4.76,"hi6":37.2,"hi10":7.4,"inc":32414.0,"cost":1546.0,"n":121},"Q3":{"med":2.93,"hi6":7.4,"hi10":1.7,"inc":64407.0,"cost":1931.0,"n":121},"Q4":{"med":1.96,"hi6":2.5,"hi10":0.0,"inc":128932.0,"cost":2602.0,"n":121}},"Chicago":{"Q1":{"med":10.53,"hi6":75.2,"hi10":51.8,"inc":16639.0,"cost":1418.0,"n":137},"Q2":{"med":3.42,"hi6":13.1,"hi10":1.5,"inc":47497.0,"cost":1475.0,"n":137},"Q3":{"med":1.98,"hi6":2.2,"hi10":0.0,"inc":89096.0,"cost":1748.0,"n":137},"Q4":{"med":1.06,"hi6":0.0,"hi10":0.0,"inc":189083.0,"cost":2110.0,"n":137}},"Denver":{"Q1":{"med":5.83,"hi6":47.2,"hi10":28.9,"inc":22223.0,"cost":1037.0,"n":142},"Q2":{"med":2.19,"hi6":0.7,"hi10":0.0,"inc":54746.0,"cost":1252.0,"n":142},"Q3":{"med":1.5,"hi6":0.0,"hi10":0.0,"inc":89096.0,"cost":1340.0,"n":141},"Q4":{"med":1.03,"hi6":0.0,"hi10":0.0,"inc":169093.0,"cost":1797.0,"n":142}}},"df":{"Houston":{"res":{"df":1.414,"peak":"2018-01-17 08:00:00","lf":0.207},"com":{"df":1.22,"peak":"2018-01-17 09:00:00","lf":0.395},"all":{"df":1.374,"peak":"2018-01-17 08:00:00","lf":0.248}},"Atlanta":{"res":{"df":1.409,"peak":"2018-01-02 07:00:00","lf":0.2},"com":{"df":1.281,"peak":"2018-01-17 10:00:00","lf":0.422},"all":{"df":1.366,"peak":"2018-01-02 07:00:00","lf":0.28}},"Baltimore":{"res":{"df":1.343,"peak":"2018-01-07 07:00:00","lf":0.196},"com":{"df":1.145,"peak":"2018-01-05 08:00:00","lf":0.302},"all":{"df":1.304,"peak":"2018-01-05 08:00:00","lf":0.221}},"Chicago":{"res":{"df":1.279,"peak":"2018-01-02 08:00:00","lf":0.216},"com":{"df":1.133,"peak":"2018-01-01 10:00:00","lf":0.258},"all":{"df":1.275,"peak":"2018-01-02 08:00:00","lf":0.227}},"Denver":{"res":{"df":1.546,"peak":"2018-02-20 09:00:00","lf":0.242},"com":{"df":1.2,"peak":"2018-12-31 11:00:00","lf":0.361},"all":{"df":1.474,"peak":"2018-02-20 09:00:00","lf":0.279}}},"skill":[{"set":"test","model":"Ridge Regression","v":0.1193,"lo":0.0617,"hi":0.1689},{"set":"test","model":"Random Forest","v":0.2631,"lo":0.1969,"hi":0.3241},{"set":"test","model":"XGBoost","v":0.3822,"lo":0.3284,"hi":0.4414},{"set":"oos","model":"Ridge Regression","v":0.0819,"lo":0.0398,"hi":0.1211},{"set":"oos","model":"Random Forest","v":0.1849,"lo":0.1513,"hi":0.2304},{"set":"oos","model":"XGBoost","v":0.1529,"lo":0.0831,"hi":0.2292}],"rmse":{"test":{"Persistence (t−1h)":27.0274,"Seasonal Naive (t−168h)":34.98,"Ridge Regression":23.8023,"Random Forest":19.9165,"XGBoost":16.6986},"oos":{"Persistence (t−1h)":23.6456,"Seasonal Naive (t−168h)":48.3117,"Ridge Regression":21.7089,"Random Forest":19.2724,"XGBoost":20.0295}}};
+const $ = s => document.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const f = (x, d = 1) => x.toLocaleString("el-GR", {minimumFractionDigits: d, maximumFractionDigits: d});
+const sg = (x, d = 1) => (x > 0 ? "+" : x < 0 ? "−" : "") + f(Math.abs(x), d);
+const CITIES = D.cities.map(c => c.name);
+const Z = Object.fromEntries(D.cities.map(c => [c.name, c.zone]));
+const st = {w: 0.5, r: 0, ssp: "SSP5-8.5", per: "2081-2100"};
+
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function txt(parent, x, y, s, attrs = {}) { const t = el("text", {x, y, ...attrs}, parent); t.textContent = s; return t; }
+function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+
+// ── model, same formulas as the thesis ──────────────────────────────
+// CO₂(r) is exactly linear in r (Ch.5 §5.1.3). At the table steps 0/25/50/75 % the published values
+// of Table 5.6 are used as they are; between steps, linear interpolation (exact for a linear relation).
+function co2(city, r) {
+  const s = D.grid[city].all.steps, k = Math.min(2, Math.floor(r / 0.25 + 1e-9)), t = (r - 0.25 * k) / 0.25;
+  return s[k] + (s[k + 1] - s[k]) * t;
+}
+function minmaxBestLow(obj) {
+  const v = Object.values(obj), mx = Math.max(...v), mn = Math.min(...v);
+  return Object.fromEntries(Object.entries(obj).map(([k, x]) => [k, mx === mn ? 100 : 100 * (mx - x) / (mx - mn)]));
+}
+function composite() {
+  const E = Object.fromEntries(CITIES.map(c => [c, co2(c, st.r)]));
+  const S = Object.fromEntries(CITIES.map(c => [c, D.esg[c].S]));
+  const Es = minmaxBestLow(E), Ss = minmaxBestLow(S);
+  const rows = CITIES.map(c => {
+    const score = Math.round((st.w * Es[c] + (1 - st.w) * Ss[c]) * 1e6) / 1e6;   // round before ranking (ties)
+    return {c, E: E[c], S: S[c], Es: Es[c], Ss: Ss[c], score};
+  });
+  rows.forEach(r => { r.rank = 1 + rows.filter(o => o.score > r.score).length;
+                      r.tie = rows.filter(o => o.score === r.score).length > 1; });
+  return rows.sort((a, b) => a.rank - b.rank || a.c.localeCompare(b.c));
+}
+const scen = () => `${st.ssp} ${st.per}`;
+
+// ── panels ──────────────────────────────────────────────────────────
+function drawRank(rows) {
+  const svg = $("#chRank"); clear(svg);
+  const x0 = 150, W = 300, rowH = 42, y0 = 14;
+  [0, 25, 50, 75, 100].forEach(v => {
+    const x = x0 + W * v / 100; el("line", {x1: x, x2: x, y1: y0 - 4, y2: y0 + rowH * 5 - 8, class: "axis"}, svg);
+    txt(svg, x, y0 + rowH * 5 + 6, f(v, 0), {"text-anchor": "middle"});
+  });
+  rows.forEach((r, i) => {
+    const y = y0 + i * rowH;
+    txt(svg, 0, y + 15, `${r.rank}${r.tie ? "=" : ""}`, {class: "num", "font-weight": "600"});
+    txt(svg, 26, y + 15, r.c, {class: "city"});
+    txt(svg, 26, y + 30, `ζώνη ${Z[r.c]}`, {"font-size": "11"});
+    const we = W * st.w * r.Es / 100, ws = W * (1 - st.w) * r.Ss / 100;
+    const tip = `${r.c}: σύνθετος ${f(r.score)} · E ${f(r.E, 2)} kg/m² (βαθμός ${f(r.Es, 0)}) · S ${f(r.S, 2)} % (βαθμός ${f(r.Ss, 0)})`;
+    if (we > 0.5) el("rect", {x: x0, y: y + 6, width: Math.max(we - 1, 0), height: 22, rx: 3, fill: "var(--e)", "data-tip": tip}, svg);
+    if (ws > 0.5) el("rect", {x: x0 + we + (we > 0.5 ? 1 : 0), y: y + 6, width: Math.max(ws - 1, 0), height: 22, rx: 3, fill: "var(--s)", "data-tip": tip}, svg);
+    txt(svg, x0 + we + ws + 8, y + 22, f(r.score), {class: "num"});
+  });
+  const top = rows.filter(r => r.rank === 1).map(r => r.c).join(" & ");
+  const ties = rows.filter(r => r.tie);
+  $("#rdRank").textContent = `Με w_E = ${f(st.w, 2)} πρώτη είναι ${top === "" ? "—" : "η πόλη " + top}.` +
+    (ties.length ? ` Ισοβαθμία: ${[...new Set(ties.map(t => t.c))].join(", ")} (${f(ties[0].score)}).` : "") +
+    " Η κατάταξη εξαρτάται από το βάρος· στην εργασία εξετάζονται τα 0,25 / 0,50 / 0,75 (Κεφ. 4, §4.5.2).";
+}
+
+function drawCo2() {
+  const svg = $("#chCo2"); clear(svg);
+  const x0 = 120, W = 330, rowH = 42, y0 = 14, mx = 80;
+  [0, 20, 40, 60, 80].forEach(v => {
+    const x = x0 + W * v / mx; el("line", {x1: x, x2: x, y1: y0 - 4, y2: y0 + rowH * 5 - 8, class: "axis"}, svg);
+    txt(svg, x, y0 + rowH * 5 + 6, f(v, 0), {"text-anchor": "middle"});
+  });
+  txt(svg, x0 + W / 2, y0 + rowH * 5 + 22, "kg CO₂ / m² · έτος", {"text-anchor": "middle", "font-size": "11"});
+  CITIES.forEach((c, i) => {
+    const y = y0 + i * rowH, base = co2(c, 0), now = co2(c, st.r), sh = D.grid[c].all.share;
+    txt(svg, 0, y + 15, c, {class: "city"});
+    txt(svg, 0, y + 30, `ηλεκτρισμός ${f(sh * 100, 0)} %`, {"font-size": "11"});
+    const tip = `${c}: ${f(base, 2)} → ${f(now, 2)} kg/m² (${sg(-sh * st.r * 100)} %) · ηλεκτρισμός ${f(sh * 100, 1)} % των εκπομπών`;
+    el("rect", {x: x0, y: y + 6, width: W * base / mx, height: 22, rx: 3, fill: "var(--ghost)", "data-tip": tip}, svg);
+    el("rect", {x: x0, y: y + 10, width: W * now / mx, height: 14, rx: 3, fill: "var(--bar)", "data-tip": tip}, svg);
+    txt(svg, x0 + W * base / mx + 8, y + 22, st.r > 0 ? `${f(now)} (${sg(-sh * st.r * 100)} %)` : f(now), {class: "num"});
+  });
+  const s = CITIES.map(c => [c, co2(c, st.r)]).sort((a, b) => a[1] - b[1]);
+  $("#rdCo2").textContent = st.r === 0
+    ? `Σήμερα τις χαμηλότερες εκπομπές έχει η ${s[0][0]} (${f(s[0][1])} kg/m²) και τις υψηλότερες το ${s[4][0]} (${f(s[4][1])}). Μετακίνησε τη μείωση του δικτύου για να δεις πώς αλλάζει η σειρά.`
+    : `Με μείωση ${f(st.r * 100, 0)} %: χαμηλότερες εκπομπές ${s[0][0]} (${f(s[0][1])}), υψηλότερες ${s[4][0]} (${f(s[4][1])}). Ωφελούνται περισσότερο οι πόλεις όπου ο ηλεκτρισμός κυριαρχεί στις εκπομπές.`;
+}
+
+function drawClim() {
+  const svg = $("#chClim"); clear(svg);
+  let lo = 0, hi = 0;
+  CITIES.forEach(c => ["res", "com"].forEach(k => D.scenarios.forEach(s => {
+    lo = Math.min(lo, D.climate[c][k][s].lo); hi = Math.max(hi, D.climate[c][k][s].hi); })));
+  lo = Math.floor(lo / 5) * 5; hi = Math.ceil(hi / 5) * 5;
+  const x0 = 120, W = 360, X = v => x0 + W * (v - lo) / (hi - lo), rowH = 54, y0 = 12;
+  for (let v = lo; v <= hi; v += 5) {
+    el("line", {x1: X(v), x2: X(v), y1: y0 - 4, y2: y0 + rowH * 5 - 6, class: v === 0 ? "zero" : "axis"}, svg);
+    txt(svg, X(v), y0 + rowH * 5 + 8, (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v), {"text-anchor": "middle"});
+  }
+  txt(svg, x0 + W, y0 + rowH * 5 + 22, "% μεταβολή έναντι 2018", {"text-anchor": "end", "font-size": "11"});
+  const s = scen();
+  CITIES.forEach((c, i) => {
+    const y = y0 + i * rowH;
+    txt(svg, 0, y + 20, c, {class: "city"}); txt(svg, 0, y + 35, `ζώνη ${Z[c]}`, {"font-size": "11"});
+    [["res", "var(--res)", "Οικιστικά", 4], ["com", "var(--com)", "Εμπορικά", 24]].forEach(([k, col, lab, dy]) => {
+      const d = D.climate[c][k][s], a = Math.min(X(0), X(d.v)), w = Math.abs(X(d.v) - X(0));
+      const tip = `${c} · ${lab}: ${sg(d.v)} % (εύρος ${sg(d.lo)} … ${sg(d.hi)} %) · ${s.replace(" ", " · ")}`;
+      el("rect", {x: a, y: y + dy, width: Math.max(w, 1.5), height: 16, rx: 3, fill: col, "data-tip": tip}, svg);
+      el("line", {x1: X(d.lo), x2: X(d.hi), y1: y + dy + 8, y2: y + dy + 8, stroke: "var(--ink)", "stroke-width": 1.5}, svg);
+      const tx = d.v >= 0 ? Math.max(X(d.v), X(d.hi)) + 6 : Math.min(X(d.v), X(d.lo)) - 6;
+      txt(svg, tx, y + dy + 12.5, sg(d.v), {class: "num", "text-anchor": d.v >= 0 ? "start" : "end"});
+    });
+  });
+  const dT = D.deltaT[s];
+  const r = CITIES.map(c => [c, D.climate[c].res[s].v]).sort((a, b) => a[1] - b[1]);
+  $("#rdClim").textContent = `ΔT ${sg(dT[0], 2)} °C (εύρος ${sg(dT[1], 2)} … ${sg(dT[2], 2)}) έναντι 1995–2014. Οικιστικά: μεγαλύτερη μείωση στο ${r[0][0]} (${sg(r[0][1])} %), ` +
+    `${r[4][1] > 0 ? "αύξηση" : "μικρότερη μεταβολή"} στο ${r[4][0]} (${sg(r[4][1])} %). Στις ψυχρές πόλεις κερδίζει η μείωση της θέρμανσης, στο Houston η αύξηση της ψύξης.`;
+}
+
+function drawBur() {
+  const svg = $("#chBur"); clear(svg);
+  const x0 = 34, W = 400, H = 170, y0 = 10, mx = 22, Y = v => y0 + H * (1 - v / mx);
+  [0, 5, 10, 15, 20].forEach(v => { el("line", {x1: x0, x2: x0 + W, y1: Y(v), y2: Y(v), class: "axis"}, svg);
+    txt(svg, x0 - 6, Y(v) + 4, f(v, 0), {"text-anchor": "end"}); });
+  [[6, "var(--warn)", "υψηλή 6 %"], [10, "var(--crit)", "σοβαρή 10 %"]].forEach(([v, col, lab]) => {
+    el("line", {x1: x0, x2: x0 + W, y1: Y(v), y2: Y(v), stroke: col, "stroke-dasharray": "5 4", "stroke-width": 1.4}, svg);
+    txt(svg, x0 + W + 6, Y(v) + 4, lab, {"font-size": "11", fill: col});
+  });
+  const gw = W / 5, bw = 14, gap = 2, qs = ["Q1", "Q2", "Q3", "Q4"], cols = ["var(--q1)", "var(--q2)", "var(--q3)", "var(--q4)"];
+  CITIES.forEach((c, i) => {
+    const gx = x0 + gw * i + (gw - (4 * bw + 3 * gap)) / 2;
+    qs.forEach((q, j) => {
+      const b = D.burden[c][q], x = gx + j * (bw + gap);
+      const tip = `${c} · ${q}: διάμεση επιβάρυνση ${f(b.med, 2)} % · εισόδημα $${f(b.inc, 0)} · κόστος $${f(b.cost, 0)}/έτος · ${f(b.hi6)} % > 6 % · N = ${b.n}`;
+      el("rect", {x, y: Y(b.med), width: bw, height: Y(0) - Y(b.med), rx: 3, fill: cols[j], "data-tip": tip}, svg);
+    });
+    txt(svg, gx - 1, Y(D.burden[c].Q1.med) - 6, f(D.burden[c].Q1.med), {class: "num"});
+    txt(svg, x0 + gw * i + gw / 2, Y(0) + 18, c, {"text-anchor": "middle", class: "city"});
+    txt(svg, x0 + gw * i + gw / 2, Y(0) + 33, `${f(D.burden[c].Q1.hi6, 0)} %`, {"text-anchor": "middle", "font-size": "11"});
+  });
+  txt(svg, x0, y0 + 4, "% εισοδήματος", {"font-size": "11"});
+  txt(svg, x0 + W / 2, Y(0) + 50, "κάτω από κάθε πόλη: % του Q1 με επιβάρυνση > 6 %", {"text-anchor": "middle", "font-size": "11"});
+  $("#rdBur").textContent = "Η επιβάρυνση εξαρτάται κυρίως από το εισόδημα και την ποιότητα της κατοικίας: στο Q4 είναι 1–2 % σε όλες τις πόλεις, στο Q1 φτάνει το 19,9 % στη Baltimore (54 % του Q1 με εισόδημα < $10.000). Δεν αλλάζει με τις ρυθμίσεις.";
+}
+
+function drawSkill() {
+  const svg = $("#chSkill"); clear(svg);
+  const models = ["Ridge Regression", "Random Forest", "XGBoost"], x0 = 130, W = 340, X = v => x0 + W * v / 0.5, y0 = 12, rowH = 48;
+  [0, 0.1, 0.2, 0.3, 0.4, 0.5].forEach(v => { el("line", {x1: X(v), x2: X(v), y1: y0 - 4, y2: y0 + rowH * 3 - 6, class: v === 0 ? "zero" : "axis"}, svg);
+    txt(svg, X(v), y0 + rowH * 3 + 8, f(v, 1), {"text-anchor": "middle"}); });
+  txt(svg, x0 + W, y0 + rowH * 3 + 22, "skill = 1 − RMSE μοντέλου / RMSE persistence", {"text-anchor": "end", "font-size": "11"});
+  models.forEach((m, i) => {
+    const y = y0 + i * rowH;
+    txt(svg, 0, y + 22, m.replace(" Regression", ""), {class: "city"});
+    [["test", 12, "var(--ink)", "πόλεις ελέγχου"], ["oos", 30, "var(--panel)", "Denver (εκτός εκπαίδευσης)"]].forEach(([set, dy, fill, lab]) => {
+      const s = D.skill.find(o => o.set === set && o.model === m);
+      el("line", {x1: X(s.lo), x2: X(s.hi), y1: y + dy, y2: y + dy, stroke: "var(--ink-2)", "stroke-width": 2}, svg);
+      [s.lo, s.hi].forEach(v => el("line", {x1: X(v), x2: X(v), y1: y + dy - 4, y2: y + dy + 4, stroke: "var(--ink-2)", "stroke-width": 1.5}, svg));
+      el("circle", {cx: X(s.v), cy: y + dy, r: 5.5, fill, stroke: "var(--ink)", "stroke-width": 2,
+        "data-tip": `${m} · ${lab}: skill ${f(s.v, 3)} (95 %: ${f(s.lo, 3)} … ${f(s.hi, 3)}) · RMSE ${f(D.rmse[set][m], 2)} kWh/h`}, svg);
+      txt(svg, X(s.hi) + 8, y + dy + 4, f(s.v, 3), {class: "num"});
+    });
+  });
+  $("#rdSkill").textContent = "Στις πόλεις ελέγχου το XGBoost είναι σαφώς καλύτερο (διαστήματα χωρίς επικάλυψη). Στο Denver τα διαστήματα του XGBoost και του Random Forest επικαλύπτονται: η διαφορά τους δεν είναι στατιστικά σημαντική (p = 0,13), ενώ όλα τα μοντέλα παραμένουν καλύτερα από το persistence.";
+}
+
+function drawDf() {
+  const t = $("#tbDf");
+  const hh = s => { const d = new Date(s.replace(" ", "T")); return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:00`; };
+  t.innerHTML = "<thead><tr><th>Πόλη</th><th>Οικιστικά</th><th>Εμπορικά</th><th>Σύνολο πόλης</th><th>Αιχμή συνόλου</th><th>Συντ. φορτίου</th></tr></thead><tbody>" +
+    CITIES.map(c => { const d = D.df[c]; return `<tr><td>${c} <span class="src">${Z[c]}</span></td><td class="mono">${f(d.res.df, 2)}</td><td class="mono">${f(d.com.df, 2)}</td><td class="mono"><b>${f(d.all.df, 2)}</b></td><td class="mono">${hh(d.all.peak)}</td><td class="mono">${f(d.all.lf, 2)}</td></tr>`; }).join("") + "</tbody>";
+}
+
+function drawSum(rows) {
+  const s = scen(), byC = Object.fromEntries(rows.map(r => [r.c, r]));
+  const cls = v => v > 10 ? "sev" : v > 6 ? "hi" : "ok";
+  $("#tbSum").innerHTML = `<thead><tr><th>Πόλη</th><th>Θέση E+S</th><th>Σύνθετος</th><th>CO₂ kg/m²</th><th>Επιβάρυνση Q1</th><th>Οικ. ${s.split(" ")[0]} ${s.split(" ")[1].replace("-", "–")}</th><th>Εμπ.</th><th>DF πόλης</th></tr></thead><tbody>` +
+    CITIES.map(c => { const r = byC[c]; return `<tr><td>${c} <span class="src">${Z[c]}</span></td><td><span class="pill${r.tie ? " tie" : ""}">${r.rank}${r.tie ? "=" : ""}</span></td><td class="mono">${f(r.score)}</td><td class="mono">${f(r.E, 2)}</td><td class="mono ${cls(r.S)}">${f(r.S, 2)} %</td><td class="mono">${sg(D.climate[c].res[s].v)} %</td><td class="mono">${sg(D.climate[c].com[s].v)} %</td><td class="mono">${f(D.df[c].all.df, 2)}</td></tr>`; }).join("") + "</tbody>";
+}
+
+function render() {
+  $("#wEv").textContent = `w_E = ${f(st.w, 2)} · w_S = ${f(1 - st.w, 2)}`;
+  $("#efv").textContent = st.r === 0 ? "0 % (δίκτυο 2018)" : `−${f(st.r * 100, 0)} %`;
+  { const d = D.deltaT[scen()];
+    $("#perv").textContent = `Θέρμανση του πλανήτη ΔT ${sg(d[0], 2)} °C (εύρος ${sg(d[1], 2)} … ${sg(d[2], 2)}) έναντι 1995–2014· τα κτίρια μένουν του 2018.`; }
+  const rows = composite();
+  drawRank(rows); drawCo2(); drawClim(); drawSum(rows);
+  const top = rows.filter(r => r.rank === 1).map(r => r.c).join(" & ");
+  const s = scen(), hot = CITIES.filter(c => D.climate[c].res[s].v > 0);
+  $("#summary").innerHTML = `Με <b>βάρος περιβάλλοντος ${f(st.w, 2)}</b> και <b>δίκτυο ${st.r === 0 ? "2018" : "−" + f(st.r * 100, 0) + " %"}</b>, πρώτη στον δείκτη E+S είναι η <b>${top}</b>. ` +
+    `Στο <b>${st.ssp}, ${st.per.replace("-", "–")}</b> η οικιστική κατανάλωση ${hot.length ? "αυξάνεται μόνο στ" + (hot.length === 1 ? "ο " : "ις ") + hot.join(", ") : "μειώνεται σε όλες τις πόλεις"}· η σοβαρότερη ενεργειακή φτώχεια παραμένει στη Baltimore.`;
+}
+
+function seg(id, opts, key) {
+  const box = $(id);
+  opts.forEach(([v, lab]) => { const b = document.createElement("button"); b.type = "button"; b.textContent = lab; b.id = `${id.slice(1)}-${v}`;
+    b.setAttribute("aria-pressed", String(st[key] === v));
+    b.addEventListener("click", () => { st[key] = v; box.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); render(); });
+    box.appendChild(b); });
+}
+seg("#ssp", [["SSP2-4.5", "SSP2-4.5"], ["SSP5-8.5", "SSP5-8.5"]], "ssp");
+seg("#per", [["2021-2040", "2021–40"], ["2041-2060", "2041–60"], ["2081-2100", "2081–2100"]], "per");
+$("#wE").addEventListener("input", e => { st.w = +e.target.value; render(); });
+$("#ef").addEventListener("input", e => { st.r = +e.target.value; render(); });
+
+// tooltip
+const tip = $("#tip");
+document.addEventListener("pointermove", e => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (!t) { tip.style.opacity = 0; return; }
+  tip.textContent = t.getAttribute("data-tip"); tip.style.opacity = 1;
+  const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+  tip.style.left = x + "px"; tip.style.top = (e.clientY + 16) + "px";
+});
+
+drawBur(); drawSkill(); drawDf(); render();
+</script>
+
+</body></html>

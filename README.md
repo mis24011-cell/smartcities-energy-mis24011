@@ -1,65 +1,83 @@
-# Κώδικας Διπλωματικής — ΝΕΟ τελικό δείγμα (5.000 κτίρια / 5 ζώνες / Copernicus)
+# Smart Cities energy analysis — MSc thesis MIS24011
 
-Αναπαραγώγιμος κώδικας (Python) που παρήγαγε ΟΛΑ τα αποτελέσματα, σχήματα και πίνακες
-της τελικής έκδοσης της διπλωματικής, στο νέο δείγμα:
-**5.000 κτίρια (1.000/ζώνη × 5: 2A Houston, 3A Atlanta, 4A Baltimore, 5A Chicago, 5B Denver),
-60% οικιστικά / 40% εμπορικά, 87.600 ωριαίες εγγραφές, κλιματικά σενάρια Copernicus
-SSP2-4.5 & SSP5-8.5 για 2040/2050/2100.**
+**Εφαρμογή μεθόδων μηχανικής μάθησης σε δεδομένα μοντέλων προσομοίωσης κτιρίων για την ανάλυση της ενεργειακής κατανάλωσης σε έξυπνες πόλεις: κλιματικά σενάρια, δείκτες ESG και υποστήριξη αποφάσεων**
 
-> Τα scripts τρέχουν και σε Jupyter: `%run <script>.py` σε ένα cell, ή επικόλληση του
-> περιεχομένου σε cells. Είναι απλά .py αντί για .ipynb — η λογική/αποτελέσματα ταυτόσημα.
+Διπλωματική εργασία — ΔΠΜΣ στα Πληροφοριακά Συστήματα, Πανεπιστήμιο Μακεδονίας (2026)
+Συγγραφέας: Αριστοτέλης Ζυγούρης · Επιβλέπων: Κωνσταντίνος Ταραμπάνης
 
-## Απαιτούμενες βιβλιοθήκες
+> **English summary.** Reproducible Python pipeline of the thesis. It uses 5,000 individual buildings from NREL ResStock 2024 R2 and ComStock 2023 R2 (600 residential + 400 commercial in Houston 2A, Atlanta 3A, Baltimore 4A, Chicago 5A and Denver 5B; 43.8 M hourly records, weather AMY2018). It covers hourly forecasting (persistence, seasonal naive, Ridge, Random Forest, XGBoost with per-building scaling; Denver held out), statistical significance (cluster bootstrap and Diebold–Mariano), IPCC AR6 climate scenarios through a separate weather model, the diversity factor, CO₂ per m² and grid-decarbonisation what-if, household energy burden, a composite E+S index with weight sensitivity, and an interactive dashboard. Every number and figure of the thesis is produced by these scripts.
+
+---
+
+## Τι περιέχει
+
+| Φάκελος | Περιεχόμενο |
+|---|---|
+| `v2/` | Ο κώδικας της ανάλυσης (βήματα 00a–10), `config.py` (όλες οι εξωτερικές τιμές με την πηγή τους), `common.py` |
+| `v2/extra/` | Οι δύο χάρτες του Διαγράμματος 3.19 (πόλεις, κλιματικές ζώνες IECC) |
+| `data/individual_final/` | Ο κατάλογος των 5.000 κτιρίων του δείγματος (`metadata.parquet`) και ο ωριαίος καιρός AMY2018 των πέντε κομητειών (`weather.parquet`) |
+| `results/tables/` | Όλοι οι πίνακες αποτελεσμάτων (CSV) της τελικής εκτέλεσης, που τροφοδοτούν το κείμενο |
+| `results/figures/` | Τα διαγράμματα της εργασίας |
+| `results/data_checks/` | Οι έλεγχοι ποιότητας (`diagnostics.txt`), τα πλήθη (`data_summary.json`) και η σύγκριση με τα ετήσια σύνολα της NREL (`annual_check.csv`) |
+| `dashboard/` | Η διαδραστική κονσόλα (`ΚΟΝΣΟΛΑ_dashboard.html`) — ανοίγει με διπλό κλικ σε οποιονδήποτε φυλλομετρητή |
+
+Τα ωριαία δεδομένα των κτιρίων (μερικά GB) **δεν** περιλαμβάνονται. Κατεβαίνουν από το δημόσιο αποθετήριο OEDI της NREL (Amazon S3, χωρίς λογαριασμό) με το βήμα 00a, για ακριβώς τα ίδια 5.000 κτίρια.
+
+## Εγκατάσταση
+
+Python ≥ 3.10.
+
+```bash
+pip install -r requirements.txt
 ```
-pandas numpy matplotlib scipy scikit-learn xgboost optuna shap pyarrow lxml pillow
+
+Σε Windows με Anaconda: `v2\INSTALL_PACKAGES.bat`.
+
+## Εκτέλεση
+
+Όλα τα βήματα εκτελούνται **από τον κεντρικό φάκελο του repository**, γιατί οι διαδρομές είναι σχετικές (`data/`, `outputs_v2/`).
+
+```bash
+# Windows
+v2\RUN_ALL.bat
+# Linux / macOS
+bash v2/run_all.sh
 ```
-`pip install pandas numpy matplotlib scipy scikit-learn xgboost optuna shap pyarrow lxml pillow`
 
-## Αρχεία δεδομένων (παράγονται από το 01, χρησιμοποιούνται από τα 02–05)
-- `merged_master.parquet` — 87.600 γραμμές (10 προφίλ × 8.760h): κατανάλωση ανά καύσιμο,
-  τελικές χρήσεις (eu.*), CO₂ ανά καύσιμο, zone, dataset_type, n_buildings.
-- `scenarios_2x3_baseline.parquet` — προβολές σεναρίων (Baseline + SSP2-4.5/SSP5-8.5 ×
-  2040/2050/2100 × 5 ζώνες): HDD/CDD, delta scaling, consumption_delta_pct.
-- `comstock_metadata.parquet`, `resstock_metadata.parquet` — μεταδεδομένα NREL (τύποι κτιρίων,
-  εμβαδόν, πολιτεία) για τα σχήματα χαρακτηριστικών. Δειγματοληψία: states TX/GA/MD/IL/CO → ζώνες 2A/3A/4A/5A/5B.
+Κάθε βήμα γράφει log στο `outputs_v2/log_<βήμα>.txt` και σταματά την εκτέλεση αν αποτύχει κάποιος έλεγχος. Η πλήρης εκτέλεση διαρκεί περίπου 4–5 ώρες σε σύγχρονο υπολογιστή, κυρίως για τη λήψη των δεδομένων και την εκπαίδευση των μοντέλων.
 
-## Δομή / σειρά εκτέλεσης
-### 01_data_acquisition — λήψη & σύνθεση δείγματος
-- `download_master_v5.py` — κύριο: κατεβάζει NREL ResStock 2024 R2 + ComStock 2023 R2 (AMY2018),
-  στρωματοποιημένη δειγματοληψία 5.000 κτιρίων, παράγει `merged_master.parquet`.
-- `download_all_zones.py`, `download_enduse.py`, `column_selector.py` — βοηθητικά (ζώνες, τελικές χρήσεις, επιλογή στηλών).
+| Βήμα | Τι κάνει | Ενότητα της εργασίας | Κύρια έξοδος |
+|---|---|---|---|
+| `00a_REDOWNLOAD_v3` | Λήψη των 5.000 κτιρίων από τη NREL, 15λεπτα → ωριαία (σύμβαση «τέλος διαστήματος») | §3.2 | `data/individual_final/buildings_v3.parquet` |
+| `00b_REPAIR_DATA` | Μοναδικός κωδικός κτιρίου, εμβαδόν σε m², ευθυγράμμιση καιρού, βάρη αποθέματος, 13 έλεγχοι ποιότητας | §3.3 | `data/v2/*`, `diagnostics.txt` |
+| `00c_VERIFY_ANNUAL` | Σύγκριση των ωριαίων αθροισμάτων με τα ετήσια σύνολα της NREL | §3.3.6 | `annual_check.csv` |
+| `01_FEATURES_v2` | 19 μεταβλητές χωρίς πληροφορία της ίδιας ώρας, υστερήσεις ανά κτίριο, διαχωρισμός εκπαίδευσης / επικύρωσης / ελέγχου | §3.4–3.5 | `ml_features_v2.parquet` |
+| `02_ML_v2` | Persistence, Seasonal Naive, Ridge, Random Forest, XGBoost (Optuna στο σύνολο επικύρωσης, κλιμάκωση ανά κτίριο) | §4.1–4.4, §4.6 | `table_4_4*`, μοντέλα |
+| `02c_SEASONAL_BY_TYPE_v2` | Skill ανά εποχή και τύπο κτιρίου | §4.6.3 | `table_4_4d` |
+| `03_CLIMATE_v2` | Μοντέλο καιρού χωρίς υστερήσεις, σενάρια IPCC AR6 (SSP2-4.5, SSP5-8.5) | §5.1.2 | `table_5_0*`, `table_5_1` |
+| `04_ENERGY_BURDEN_v2` | Ενεργειακή επιβάρυνση νοικοκυριών (όλα τα καύσιμα, τιμές EIA SEDS 2018) | §5.2 | `table_5_3*` |
+| `05_EDA_v2` | Διερευνητική ανάλυση: πίνακες και διαγράμματα του Κεφ. 3 | §3.7 | `table_3_*`, `fig_3_*` |
+| `06_ESG_DF_DECARB_v2` | Συντελεστής ετεροχρονισμού, σύνθετος δείκτης E+S, σενάρια δικτύου | §4.4.2, §4.5, §5.1.3 | `table_4_5`, `table_4_6*`, `table_5_2` |
+| `07_FIGURES_v2` | Διαγράμματα των Κεφ. 4–5 από τους πίνακες | Κεφ. 4–5 | `fig_4_*`, `fig_5_*` |
+| `08_SIGNIFICANCE_v2` | Στατιστική σημαντικότητα: bootstrap ανά κτίριο, έλεγχος Diebold–Mariano | §4.4.3 | `table_4_4e/f/g`, `fig_4_2b` |
+| `09_DASHBOARD_v2` | Διαδραστική κονσόλα (ένα αρχείο HTML) | §6.2.2, Παράρτημα Α | `dashboard_standalone.html` |
+| `10_SUPPLEMENT_v2` | Συμπληρωματικοί υπολογισμοί του κειμένου (προφίλ ανά m², σφάλματα ανά πόλη, νοικοκυριά Q1, δείκτης υπό σενάρια δικτύου) | §4.2.4, §4.4.1, §4.4.5, §5.2.2, §5.4.1 | `suppl_*` |
 
-### 02_eda_chapter3_figures — Διερευνητική ανάλυση & σχήματα Κεφ. 3
-- `phase3_eda*.py` — βασικά EDA στατιστικά ανά ζώνη.
-- `fig_sampling_funnel.py` → Σχ 3.1 (funnel δειγματοληψίας). `fig_zones.py`/`fig_maps.py`/`fig_map_*` → χάρτες ζωνών/καυσίμων/CO₂/βαθμοημερών.
-- `fig_stock_res.py`/`fig_stock_com.py` → χαρακτηριστικά αποθέματος.
-- **fig_v6_residential.py** → Σχ 3.5–3.8 (οικιστικά: καύσιμα, CO₂, ανά ζώνη, χρονικά).
-- **fig_v6_commercial.py** + **fig_v6_symmetry.py** → Σχ 3.11–3.15 (εμπορικά, συμμετρικά με οικιστικά· + res χαρακτηριστικά με πίνακα m²).
-- **fig_v6_52.py** → Σχ 5.2 (CO₂ ανά σενάριο, decoupling). `fig_emission_heatmap_allzones.py` → θερμικός χάρτης εκπομπών 5 ζωνών.
+Οι χάρτες του Διαγράμματος 3.19 (προαιρετικά): `python v2/extra/map_cities.py` και `python v2/extra/map_zones.py` (απαιτούν `basemap`, `shapely`, `eeweather`).
 
-### 03_ml_chapter4 — Μηχανική Μάθηση (Ψηφιακό Δίδυμο)
-- **ch4_run.py** — κύριο pipeline: features (31), χρονολογικός διαχωρισμός 70/15/15 (5B out-of-sample),
-  Optuna (30 trials), XGBoost / Random Forest / Naive Seasonal / Prophet, SHAP. Παράγει Πίν 4.1–4.5.
-  Αποτελέσματα: XGBoost R²=0,9991 · 5B OOS R²=0,9954.
-- `ch4_district_esg.py` → Πίν 4.6 (ESG 5 ζωνών), Πίν 4.7 (climate stress), Σχ 4.1–4.3.
-- `ch4_figures.py`, `ch4_pipeline.py`, `build_eval.py` — σχήματα/βοηθητικά ML.
+## Αναπαραγωγιμότητα
 
-### 04_climate_scenarios_chapter5 — Κλιματικά σενάρια (Copernicus)
-- `climate_scenarios_v2.py` — delta scaling επί Copernicus CDS, εναρμόνιση βαθμοημερών (πραγματικές ASHRAE),
-  παράγει `scenarios_2x3_baseline.parquet`. `recalibrate_and_regen.py` — επαναβαθμονόμηση.
+- Κάθε εξωτερική τιμή (συντελεστές εκπομπών eGRID2018 και EPA, τιμές ενέργειας EIA, ΔT του IPCC, κατώφλια επιβάρυνσης) ορίζεται **μία φορά** στο `config.py`, με την πηγή της.
+- Σταθερό seed (42) σε όλες τις τυχαίες επιλογές· 30 δοκιμές Optuna ανά μοντέλο.
+- Κάθε πίνακας και διάγραμμα παράγεται από τα αρχεία αποτελεσμάτων· κανένας αριθμός δεν πληκτρολογείται με το χέρι.
+- Τα αποτελέσματα της τελικής εκτέλεσης βρίσκονται στον φάκελο `results/`. Νέα εκτέλεση γράφει στο `outputs_v2/`, ώστε να μπορεί να συγκριθεί.
 
-### 05_esg_social_phase4 — ESG & Κοινωνικός πυλώνας
-- `phase4_figures.py` — Σχ 5.1 (μεταβολή κατανάλωσης), τροχιά CO₂ (grid decarbonization
-  GRID_DECARB 2018=100%→2100=10%· EF_ELEC ανά ζώνη· EF_GAS/OIL/PROPANE).
-- `phase4_esg.py` → ESG dashboard/scores. `phase4_social.py` → energy burden / τρωτότητα.
+## Δεδομένα και άδειες
 
-### tools
-- `splice_master.py` — εργαλείο ενσωμάτωσης σχημάτων/κειμένου στο .docx (XML surgery).
+- **Δεδομένα:** NREL, *End-Use Load Profiles for the U.S. Building Stock* — ResStock 2024 Release 2 και ComStock 2023 Release 2, Open Energy Data Initiative (OEDI), ελεύθερα διαθέσιμα υπό τις άδειες ResStock και ComStock της NREL (βλ. [Registry of Open Data on AWS](https://registry.opendata.aws/nrel-pds-building-stock/)). Τα αρχεία του φακέλου `data/individual_final/` είναι απόσπασμα αυτών των δεδομένων (μεταδεδομένα και καιρός των 5.000 κτιρίων του δείγματος).
+- **Όρια κλιματικών ζωνών** (μόνο για τον χάρτη): πακέτο `eeweather` (OpenEEmeter, Apache-2.0).
+- **Κώδικας:** άδεια MIT (αρχείο `LICENSE`).
 
-## Βασικά επαληθευμένα αποτελέσματα (για γρήγορο έλεγχο)
-- Μείγμα καυσίμων οικιστικών: 48,0% ηλεκτρισμός / 47,6% αέριο (συμφωνεί με EIA RECS 2020).
-- XGBoost R²=0,9991 · RMSE 0,486 · MAPE 5,94% · 5B OOS R²=0,9954.
-- ESG: 4A καλύτερη (B), 2A χειρότερη (E). Climate stress 3A: +1,0% (2040) → +7,9% (2100, SSP5-8.5).
-- CO₂ ανά σενάριο: −48% (2040) → −75% (2100) λόγω αποανθρακοποίησης δικτύου.
+## Παραπομπή
 
-Επεξεργασία: Αριστοτέλης Ζυγούρης (2026) · NREL ResStock/ComStock · Copernicus CDS.
+Ζυγούρης, Α. (2026), *Εφαρμογή μεθόδων μηχανικής μάθησης σε δεδομένα μοντέλων προσομοίωσης κτιρίων για την ανάλυση της ενεργειακής κατανάλωσης σε έξυπνες πόλεις: κλιματικά σενάρια, δείκτες ESG και υποστήριξη αποφάσεων*, Διπλωματική εργασία, ΔΠΜΣ στα Πληροφοριακά Συστήματα, Πανεπιστήμιο Μακεδονίας, Θεσσαλονίκη. Βλ. επίσης `CITATION.cff`.
