@@ -1,0 +1,15 @@
+# large data: downloaded / produced by the pipeline (00a–00c)
+data/*
+!data/individual_final/
+data/individual_final/*
+!data/individual_final/metadata.parquet
+!data/individual_final/weather.parquet
+# outputs of a new run (the results of the thesis run are in results/)
+outputs_v2/
+outputs_v2_run*/
+*.parquet.tmp
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
