@@ -59,6 +59,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .panel .q{color:var(--ink-3);font-size:13px;margin:0}
 .panel .read{color:var(--ink-2);font-size:13.5px;margin:0;border-top:1px solid var(--rule);padding-top:8px}
 .src{font:400 11.5px var(--f-mono);color:var(--ink-3)}
+/* "Fixed" badge: panels whose values do not depend on the controls (2018 data) */
+.fixed{justify-self:start;display:inline-flex;align-items:center;gap:6px;font:500 12px/1.35 var(--f-body);
+  color:var(--ink-3);border:1px dashed var(--ghost);border-radius:6px;padding:2px 9px}
+.fixed::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ghost)}
+.fixed-why{color:var(--ink-3);font-size:12.5px;margin:0}
+.deps{display:grid;gap:3px;margin:0;padding:8px 0 0;border-top:1px solid var(--rule);color:var(--ink-2);font-size:13px;list-style:none}
+.deps b{font-weight:600;color:var(--ink)}
 svg{display:block;width:100%;height:auto;overflow:visible}
 svg text{fill:var(--ink-2);font-family:var(--f-body);font-size:12px}
 svg .num{paint-order:stroke;stroke:var(--panel);stroke-width:3px;stroke-linejoin:round;font-family:var(--f-mono);font-size:11.5px;fill:var(--ink);font-variant-numeric:tabular-nums}
@@ -143,6 +150,8 @@ footer{color:var(--ink-3);font-size:12.5px;display:grid;gap:4px}
 
     <section class="panel">
       <h2>Ενεργειακή επιβάρυνση νοικοκυριών</h2>
+      <span class="fixed">Σταθερό — δεν εξαρτάται από τις ρυθμίσεις (δεδομένα 2018)</span>
+      <p class="fixed-why">Η επιβάρυνση εξαρτάται από το εισόδημα και το κόστος ενέργειας, όχι από τις εκπομπές του δικτύου· μελλοντικές τιμές θα ήταν παραδοχή (§5.2).</p>
       <p class="q">Τι ποσοστό του εισοδήματος πληρώνει για ενέργεια το διάμεσο νοικοκυριό κάθε τεταρτημορίου;</p>
       <div class="legend"><span><i style="background:var(--q1)"></i>Q1 φτωχότερο 25 %</span><span><i style="background:var(--q2)"></i>Q2</span><span><i style="background:var(--q3)"></i>Q3</span><span><i style="background:var(--q4)"></i>Q4</span></div>
       <svg id="chBur" viewBox="0 0 520 260" role="img" aria-label="Διάμεση ενεργειακή επιβάρυνση ανά τεταρτημόριο"></svg>
@@ -151,6 +160,8 @@ footer{color:var(--ink-3);font-size:12.5px;display:grid;gap:4px}
 
     <section class="panel">
       <h2>Αξιοπιστία της ωριαίας πρόβλεψης</h2>
+      <span class="fixed">Σταθερό — δεν εξαρτάται από τις ρυθμίσεις (δεδομένα 2018)</span>
+      <p class="fixed-why">Η αξιοπιστία είναι ιδιότητα του μοντέλου στο σύνολο ελέγχου του 2018, όχι του σεναρίου.</p>
       <p class="q">Πόσο καλύτερα από την «προηγούμενη ώρα» προβλέπει κάθε μοντέλο; Οι γραμμές είναι διαστήματα 95 % (bootstrap ανά κτίριο).</p>
       <div class="legend"><span><span class="mk" style="background:var(--ink)"></span>Πόλεις ελέγχου 2A–5A</span><span><span class="mk" style="background:var(--panel)"></span>Denver 5B, εκτός εκπαίδευσης</span></div>
       <svg id="chSkill" viewBox="0 0 520 190" role="img" aria-label="Skill μοντέλων με διαστήματα εμπιστοσύνης"></svg>
@@ -159,6 +170,8 @@ footer{color:var(--ink-3);font-size:12.5px;display:grid;gap:4px}
 
     <section class="panel">
       <h2>Αιχμή και ετεροχρονισμός</h2>
+      <span class="fixed">Σταθερό — δεν εξαρτάται από τις ρυθμίσεις (δεδομένα 2018)</span>
+      <p class="fixed-why">Ο DF υπολογίζεται από τα ωριαία φορτία του 2018· το κλιματικό μοντέλο δίνει μόνο τη μεταβολή της ετήσιας κατανάλωσης.</p>
       <p class="q">Πόσο μικρότερη είναι η αιχμή της πόλης από το άθροισμα των ατομικών αιχμών, και πότε συμβαίνει;</p>
       <div class="tablewrap"><table id="tbDf"></table></div>
       <p class="read">DF = Σ ατομικών αιχμών / αιχμή του συνόλου, σταθμισμένο με το απόθεμα κάθε κομητείας. DF 1,37 σημαίνει ότι το δίκτυο βλέπει αιχμή 27 % μικρότερη από το άθροισμα (1 − 1/DF).</p>
@@ -168,6 +181,12 @@ footer{color:var(--ink-3);font-size:12.5px;display:grid;gap:4px}
   <section class="panel">
     <h2>Πίνακας σύνοψης με τις τρέχουσες ρυθμίσεις</h2>
     <div class="tablewrap"><table id="tbSum"></table></div>
+    <ul class="deps" aria-label="Ποια ρύθμιση αλλάζει κάθε στήλη">
+      <li><b>Θέση E+S, Σύνθετος:</b> αλλάζουν με το βάρος E και τη μείωση του συντελεστή δικτύου.</li>
+      <li><b>CO₂ kg/m²:</b> αλλάζει με τη μείωση του συντελεστή δικτύου.</li>
+      <li><b>Οικ., Εμπ.:</b> αλλάζουν με το κλιματικό σενάριο και την περίοδο.</li>
+      <li><b>Επιβάρυνση Q1, DF πόλης:</b> σταθερά (δεδομένα 2018).</li>
+    </ul>
   </section>
 
   <footer>
