@@ -81,6 +81,12 @@ def shifted(X, dT):
     return Xs
 
 
+# Optional switches used ONLY by 11_REVISION_v2.py stage D (sensitivity without month variables).
+# Defaults reproduce the main analysis exactly.
+REUSE_MODEL = None      # path of an already trained xgb_climate.json -> skip training
+CENTRAL_ONLY = False    # True -> only the central ΔT is predicted; "low"/"high" copy it
+
+
 def main():
     C.ensure_dirs()
     cols = pq.read_schema(C.BLDG_V2).names
@@ -108,7 +114,19 @@ def main():
     # NOTE: unlike the forecasting models of Ch.4, this model is a scenario
     # tool applied to all five cities, so Denver is included in training
     # (stated in Ch.5). Its accuracy is reported per city below.
-    tr, va, te = (df[df["split"] == s] for s in ("train", "val", "test"))
+    if REUSE_MODEL is not None:                      # revision: model already trained
+        final = XGBRegressor()
+        final.load_model(str(REUSE_MODEL))
+        n_trees = final.get_booster().num_boosted_rounds()
+    else:
+        tr, va = (df[df["split"] == s] for s in ("train", "val"))
+        final, n_trees = _train(tr, va, df[df["split"] != "test"])
+        del tr, va
+    final.save_model(str(C.MODELS / "xgb_climate.json"))
+    _after_training(df, final, n_trees)
+
+
+def _train(tr, va, trva):
     m = XGBRegressor(n_estimators=C.MAX_TREES, tree_method="hist", random_state=C.SEED,
                      n_jobs=-1, early_stopping_rounds=C.EARLY_STOPPING_ROUNDS,
                      eval_metric="rmse", **CLIM_PARAMS)
@@ -117,10 +135,12 @@ def main():
     n_trees = int(m.best_iteration) + 1
     final = XGBRegressor(n_estimators=n_trees, tree_method="hist", random_state=C.SEED,
                          n_jobs=-1, **CLIM_PARAMS)
-    trva = df[df["split"] != "test"]
     final.fit(trva[CLIM_FEATURES], trva["y_wh_m2"], verbose=False)
-    final.save_model(str(C.MODELS / "xgb_climate.json"))
+    return final, n_trees
 
+
+def _after_training(df, final, n_trees):
+    te, trva = df[df["split"] == "test"], df[df["split"] != "test"]
     acc = [metrics(te["y_wh_m2"], final.predict(te[CLIM_FEATURES]), "Climate model — hourly EUI (Wh/m²), test")]
     for dtype in ("residential", "commercial"):
         s = te[te["dataset_type"] == dtype]
@@ -149,7 +169,7 @@ def main():
         ex.append(r)
     pd.DataFrame(ex).to_csv(C.TABLES / "table_5_0b_extrapolation.csv", index=False,
                             encoding="utf-8-sig")
-    del tr, va, te, trva
+    del te, trva
 
     # ── 2. Baseline + scenarios, per city (memory-friendly) ──────────
     rows_b = []
@@ -169,11 +189,13 @@ def main():
         ann["EUI_actual"] = annual(sub["y_wh_m2"])
         ann["EUI_model_base"] = annual(final.predict(X))
         for sc, (best, lo, hi) in C.SCENARIOS.items():
-            for tag, dT in (("best", best), ("low", lo), ("high", hi)):
-                ann[f"{sc}|{tag}"] = annual(final.predict(shifted(X, dT)))
+            ann[f"{sc}|best"] = annual(final.predict(shifted(X, best)))
+            for tag, dT in (("low", lo), ("high", hi)):
+                ann[f"{sc}|{tag}"] = (ann[f"{sc}|best"] if CENTRAL_ONLY
+                                      else annual(final.predict(shifted(X, dT))))
         assert ann.notna().all().all(), f"{city}: NaN in annual EUI table"
         rows_b.append(ann.rename_axis("building_uid").reset_index())
-        print(f"  ✓ {city}")
+        print(f"  ✓ {city}", flush=True)
     byb = pd.concat(rows_b, ignore_index=True)
     byb.to_parquet(C.TABLES / "table_5_1_climate_by_building.parquet", index=False)
 

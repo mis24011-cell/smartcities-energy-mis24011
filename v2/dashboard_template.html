@@ -169,10 +169,10 @@ footer{color:var(--ink-3);font-size:12.5px;display:grid;gap:4px}
     <section class="panel">
       <h2>Αιχμή και ετεροχρονισμός</h2>
       <span class="fixed">Σταθερό — δεν εξαρτάται από τις ρυθμίσεις (δεδομένα 2018)</span>
-      <p class="fixed-why">Ο DF υπολογίζεται από τα ωριαία φορτία του 2018· το κλιματικό μοντέλο δίνει μόνο τη μεταβολή της ετήσιας κατανάλωσης.</p>
-      <p class="q">Πόσο μικρότερη είναι η αιχμή της πόλης από το άθροισμα των ατομικών αιχμών, και πότε συμβαίνει;</p>
+      <p class="fixed-why">Ο DF υπολογίζεται από τα ωριαία ηλεκτρικά φορτία του 2018· το κλιματικό μοντέλο δίνει μόνο τη μεταβολή της ετήσιας κατανάλωσης.</p>
+      <p class="q">Πόσο μικρότερη είναι η ηλεκτρική αιχμή της πόλης από το άθροισμα των ατομικών αιχμών, και πότε συμβαίνει;</p>
       <div class="tablewrap"><table id="tbDf"></table></div>
-      <p class="read">DF = Σ ατομικών αιχμών / αιχμή του συνόλου, σταθμισμένο με το απόθεμα κάθε κομητείας. DF 1,37 σημαίνει ότι το δίκτυο βλέπει αιχμή 27 % μικρότερη από το άθροισμα (1 − 1/DF).</p>
+      <p class="read">Στήλες Οικιστικά, Εμπορικά, Σύνολο: DF ηλεκτρισμού. Στήλη Αέριο: DF φυσικού αερίου του συνόλου. DF = Σ ατομικών αιχμών / αιχμή του συνόλου, σταθμισμένο με το απόθεμα κάθε κομητείας, για τον ηλεκτρισμό, που φορτίζει το δίκτυο. DF 2,11 σημαίνει ότι το δίκτυο βλέπει αιχμή 53 % μικρότερη από το άθροισμα (1 − 1/DF). Το φυσικό αέριο, με αιχμή σχεδόν ταυτόχρονη σε όλα τα κτίρια τα χειμωνιάτικα πρωινά, έχει DF μόλις 1,18–1,33.</p>
     </section>
   </div>
 
@@ -288,6 +288,24 @@ function drawCo2() {
     : `Με μείωση ${f(st.r * 100, 0)} %: χαμηλότερες εκπομπές ${s[0][0]} (${f(s[0][1])}), υψηλότερες ${s[4][0]} (${f(s[4][1])}). Ωφελούνται περισσότερο οι πόλεις όπου ο ηλεκτρισμός κυριαρχεί στις εκπομπές.`;
 }
 
+// Which effect prevails in each city for the chosen scenario (supervisor 20/10/2026, comment 8):
+// residential change < −0,5 % -> lower heating prevails, > +0,5 % -> more cooling prevails,
+// otherwise the two effects roughly cancel. Text follows the data, not a fixed sentence.
+// Greek article + preposition: η Atlanta, η Baltimore, το Houston / Chicago / Denver
+const ART = c => ({Atlanta: "στην ", Baltimore: "στη "})[c] || "στο ";
+
+function climBalance(s) {
+  const TH = 0.5;
+  const list = a => a.map(c => ART(c) + c).join(", ").replace(/, ([^,]*)$/, " και $1");
+  const v = c => Math.round(D.climate[c].res[s].v * 10) / 10;   // as displayed (1 decimal)
+  const heat = CITIES.filter(c => v(c) < -TH), cool = CITIES.filter(c => v(c) > TH),
+        even = CITIES.filter(c => Math.abs(v(c)) <= TH), out = [];
+  if (heat.length) out.push(`υπερισχύει η μείωση της θέρμανσης ${list(heat)}`);
+  if (cool.length) out.push(`${list(cool)} υπερισχύει η αύξηση της ψύξης`);
+  if (even.length) out.push(`${list(even)} οι δύο επιδράσεις σχεδόν αλληλοαναιρούνται (μεταβολή έως ±0,5 %)`);
+  return out.length ? `Στα οικιστικά ${out.join(", ενώ ")}.` : "";
+}
+
 function drawClim() {
   const svg = $("#chClim"); clear(svg);
   let lo = 0, hi = 0;
@@ -315,8 +333,8 @@ function drawClim() {
   });
   const dT = D.deltaT[s];
   const r = CITIES.map(c => [c, D.climate[c].res[s].v]).sort((a, b) => a[1] - b[1]);
-  $("#rdClim").textContent = `ΔT ${sg(dT[0], 2)} °C (εύρος ${sg(dT[1], 2)} … ${sg(dT[2], 2)}) έναντι 1995–2014. Οικιστικά: μεγαλύτερη μείωση στο ${r[0][0]} (${sg(r[0][1])} %), ` +
-    `${r[4][1] > 0 ? "αύξηση" : "μικρότερη μεταβολή"} στο ${r[4][0]} (${sg(r[4][1])} %). Στις ψυχρές πόλεις κερδίζει η μείωση της θέρμανσης, στο Houston η αύξηση της ψύξης.`;
+  $("#rdClim").textContent = `ΔT ${sg(dT[0], 2)} °C (εύρος ${sg(dT[1], 2)} … ${sg(dT[2], 2)}) έναντι 1995–2014. Οικιστικά: μεγαλύτερη μείωση ${ART(r[0][0])}${r[0][0]} (${sg(r[0][1])} %), ` +
+    `${r[4][1] > 0 ? "αύξηση" : "μικρότερη μεταβολή"} ${ART(r[4][0])}${r[4][0]} (${sg(r[4][1])} %). ` + climBalance(s);
 }
 
 function drawBur() {
@@ -363,20 +381,20 @@ function drawSkill() {
       txt(svg, X(s.hi) + 8, y + dy + 4, f(s.v, 3), {class: "num"});
     });
   });
-  $("#rdSkill").textContent = "Στις πόλεις ελέγχου το XGBoost είναι σαφώς καλύτερο (διαστήματα χωρίς επικάλυψη). Στο Denver τα διαστήματα του XGBoost και του Random Forest επικαλύπτονται: η διαφορά τους δεν είναι στατιστικά σημαντική (p = 0,13), ενώ όλα τα μοντέλα παραμένουν καλύτερα από το persistence.";
+  $("#rdSkill").textContent = "Στις πόλεις ελέγχου το XGBoost είναι σαφώς καλύτερο (διαστήματα χωρίς επικάλυψη). Στο Denver τα διαστήματα του XGBoost και του Random Forest επικαλύπτονται: η διαφορά τους δεν είναι στατιστικά σημαντική (p = 0,13), ενώ όλα τα μοντέλα παραμένουν καλύτερα από το persistence. Με ρύθμιση υπερπαραμέτρων το Random Forest φτάνει στο Denver skill 0,228 (Κεφ. 4, §4.4.3).";
 }
 
 function drawDf() {
   const t = $("#tbDf");
   const hh = s => { const d = new Date(s.replace(" ", "T")); return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:00`; };
-  t.innerHTML = "<thead><tr><th>Πόλη</th><th>Οικιστικά</th><th>Εμπορικά</th><th>Σύνολο πόλης</th><th>Αιχμή συνόλου</th><th>Συντ. φορτίου</th></tr></thead><tbody>" +
-    CITIES.map(c => { const d = D.df[c]; return `<tr><td>${c} <span class="src">${Z[c]}</span></td><td class="mono">${f(d.res.df, 2)}</td><td class="mono">${f(d.com.df, 2)}</td><td class="mono"><b>${f(d.all.df, 2)}</b></td><td class="mono">${hh(d.all.peak)}</td><td class="mono">${f(d.all.lf, 2)}</td></tr>`; }).join("") + "</tbody>";
+  t.innerHTML = "<thead><tr><th>Πόλη</th><th>Οικιστικά</th><th>Εμπορικά</th><th>Σύνολο</th><th>Αιχμή συνόλου</th><th>Αέριο</th></tr></thead><tbody>" +
+    CITIES.map(c => { const d = D.df[c]; return `<tr><td>${c} <span class="src">${Z[c]}</span></td><td class="mono">${f(d.res.df, 2)}</td><td class="mono">${f(d.com.df, 2)}</td><td class="mono"><b>${f(d.all.df, 2)}</b></td><td class="mono">${hh(d.all.peak)}</td><td class="mono">${f(d.gas.df, 2)}</td></tr>`; }).join("") + "</tbody>";
 }
 
 function drawSum(rows) {
   const s = scen(), byC = Object.fromEntries(rows.map(r => [r.c, r]));
   const cls = v => v > 10 ? "sev" : v > 6 ? "hi" : "ok";
-  $("#tbSum").innerHTML = `<thead><tr><th>Πόλη</th><th>Θέση E+S</th><th>Σύνθετος</th><th>CO₂ kg/m²</th><th>Επιβάρυνση Q1</th><th>Οικ. ${s.split(" ")[0]} ${s.split(" ")[1].replace("-", "–")}</th><th>Εμπ.</th><th>DF πόλης</th></tr></thead><tbody>` +
+  $("#tbSum").innerHTML = `<thead><tr><th>Πόλη</th><th>Θέση E+S</th><th>Σύνθετος</th><th>CO₂ kg/m²</th><th>Επιβάρυνση Q1</th><th>Οικ. ${s.split(" ")[0]} ${s.split(" ")[1].replace("-", "–")}</th><th>Εμπ.</th><th>DF ηλεκτρ.</th></tr></thead><tbody>` +
     CITIES.map(c => { const r = byC[c]; return `<tr><td>${c} <span class="src">${Z[c]}</span></td><td><span class="pill${r.tie ? " tie" : ""}">${r.rank}${r.tie ? "=" : ""}</span></td><td class="mono">${f(r.score)}</td><td class="mono">${f(r.E, 2)}</td><td class="mono ${cls(r.S)}">${f(r.S, 2)} %</td><td class="mono">${sg(D.climate[c].res[s].v)} %</td><td class="mono">${sg(D.climate[c].com[s].v)} %</td><td class="mono">${f(D.df[c].all.df, 2)}</td></tr>`; }).join("") + "</tbody>";
 }
 
@@ -387,9 +405,10 @@ function render() {
     $("#perv").textContent = `Θέρμανση του πλανήτη ΔT ${sg(d[0], 2)} °C (εύρος ${sg(d[1], 2)} … ${sg(d[2], 2)}) έναντι 1995–2014· τα κτίρια μένουν του 2018.`; }
   const rows = composite();
   drawRank(rows); drawCo2(); drawClim(); drawSum(rows);
-  const top = rows.filter(r => r.rank === 1).map(r => r.c).join(" & ");
+  const NOM = c => (c === "Atlanta" || c === "Baltimore" ? "η " : "το ");   // η Atlanta, το Houston
+  const top = rows.filter(r => r.rank === 1).map(r => NOM(r.c) + "<b>" + r.c + "</b>").join(" και ");
   const s = scen(), hot = CITIES.filter(c => D.climate[c].res[s].v > 0);
-  $("#summary").innerHTML = `Με <b>βάρος περιβάλλοντος ${f(st.w, 2)}</b> και <b>δίκτυο ${st.r === 0 ? "2018" : "−" + f(st.r * 100, 0) + " %"}</b>, πρώτη στον δείκτη E+S είναι η <b>${top}</b>. ` +
+  $("#summary").innerHTML = `Με <b>βάρος περιβάλλοντος ${f(st.w, 2)}</b> και <b>δίκτυο ${st.r === 0 ? "2018" : "−" + f(st.r * 100, 0) + " %"}</b>, στην πρώτη θέση του δείκτη E+S είναι ${top}. ` +
     `Στο <b>${st.ssp}, ${st.per.replace("-", "–")}</b> η οικιστική κατανάλωση ${hot.length ? "αυξάνεται μόνο στ" + (hot.length === 1 ? "ο " : "ις ") + hot.join(", ") : "μειώνεται σε όλες τις πόλεις"}· η σοβαρότερη ενεργειακή φτώχεια παραμένει στη Baltimore.`;
 }
 

@@ -1,0 +1,10 @@
+{
+  "n_estimators": 150,
+  "max_depth": 15,
+  "min_samples_leaf": 9,
+  "max_features": 0.8229267152552961,
+  "max_samples": 0.19869406036895207,
+  "val_rmse": 16.48678583093594,
+  "trials": 15,
+  "tuning_minutes": 14.4
+}

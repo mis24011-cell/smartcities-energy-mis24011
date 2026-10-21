@@ -35,7 +35,6 @@ def build_data():
     grid = csv("table_5_2_grid_whatif.csv")
     cl = csv("table_5_1_climate.csv")
     bur = csv("table_5_3_energy_burden.csv")
-    dfz = csv("table_4_5_diversity.csv")
     sk = csv("table_4_4e_bootstrap_skill.csv")
     te = csv("table_4_4_benchmark_test.csv").set_index("Μοντέλο")
     oo = csv("table_4_4_benchmark_oos.csv").set_index("Μοντέλο")
@@ -76,14 +75,21 @@ def build_data():
                                  "hi10": float(r["Σοβαρό burden >10% (% νοικ.)"]),
                                  "inc": float(r["Διάμεσο εισόδημα ($)"]),
                                  "cost": float(r["Διάμεσο ετήσιο κόστος ($)"]), "n": int(r["N"])}
+    # DF per fuel (revision 20/10/2026, comment 1): the grid sees ELECTRICITY peaks, so the
+    # console shows the electricity DF (11_REVISION_v2.py stage A) and the natural-gas DF of
+    # the whole city for comparison; the old table_4_5 DF was on total site energy.
+    dff = pd.read_csv(C.OUT_DIR / "revision" / "rev_A_diversity_by_fuel.csv", encoding="utf-8-sig")
     d["df"] = {}
     for c in CITIES:
         d["df"][c] = {}
         for t, k in (("Οικιστικά", "res"), ("Εμπορικά", "com"), ("Σύνολο", "all")):
-            r = dfz[(dfz["Πόλη"] == c) & (dfz["Τύπος"] == t)].iloc[0]
-            d["df"][c][k] = {"df": float(r["Συντελεστής ετεροχρονισμού DF"]),
+            r = dff[(dff["Πόλη"] == c) & (dff["Τύπος"] == t) & (dff["Καύσιμο"] == "Ηλεκτρισμός")].iloc[0]
+            d["df"][c][k] = {"df": float(r["DF"]),
                              "peak": str(r["Ώρα αιχμής συνόλου"]),
+                             "mw": float(r["Αιχμή συνόλου, απόθεμα (MW)"]),
                              "lf": float(r["Συντελεστής φορτίου (μέσο/αιχμή)"])}
+        g = dff[(dff["Πόλη"] == c) & (dff["Τύπος"] == "Σύνολο") & (dff["Καύσιμο"] == "Φυσικό αέριο")].iloc[0]
+        d["df"][c]["gas"] = {"df": float(g["DF"]), "peak": str(g["Ώρα αιχμής συνόλου"])}
     d["skill"] = []
     for _, r in sk[sk["Τύπος"] == "Όλα"].iterrows():
         d["skill"].append({"set": "test" if r["Σύνολο"].startswith("Έλεγχος") else "oos",
