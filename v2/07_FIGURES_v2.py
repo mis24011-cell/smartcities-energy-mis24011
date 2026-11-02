@@ -307,14 +307,14 @@ def fig_5_0_climate_check():
         ax.set_title(f"{TYPE_GR[dtype]}: R² {gr(r['R²'], 3)}, CV(RMSE) {gr(r['CV(RMSE) (%)'], 1)}%, "
                      f"NMBE {gr(r['NMBE (%)'], 1)}%", fontsize=9)
         ax.set_xlabel("Ετήσια EUI 2018 NREL (kWh/m²·έτος)")
-        ax.set_ylabel("Ετήσια EUI μοντέλου καιρού (kWh/m²·έτος)")
+        ax.set_ylabel("Ετήσια EUI μοντέλου σεναρίων (kWh/m²·έτος)")
         gr_axis(ax, "both")
     # legend of the city colours (one entry per city)
     from matplotlib.lines import Line2D
     h = [Line2D([], [], marker="o", ls="", color=ZONE_COLORS[C.CITY_ZONE[c]],
                 label=f"{c} ({C.CITY_ZONE[c]})") for c in C.CITIES]
     axes[0].legend(handles=h, fontsize=8, loc="upper left")
-    fig.suptitle("Έλεγχος του μοντέλου καιρού (χωρίς lags) πριν από τα κλιματικά σενάρια")
+    fig.suptitle("Έλεγχος του μοντέλου κλιματικών σεναρίων (χωρίς υστερήσεις) πριν από τα σενάρια")
     save_fig(fig, "fig_5_0_climate_model_check.png")
 
 

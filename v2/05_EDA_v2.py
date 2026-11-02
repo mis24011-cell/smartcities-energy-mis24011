@@ -356,7 +356,7 @@ def fig_split():
     ax.legend(handles=[Patch(color=cmap(0), label=f"Εκπαίδευση ({int(n.get(0, 0))} ημ.)"),
                        Patch(color=cmap(1), label=f"Επικύρωση ({int(n.get(1, 0))} ημ.)"),
                        Patch(color=cmap(2), label=f"Έλεγχος ({int(n.get(2, 0))} ημ.)"),
-                       Patch(color=cmap(3), label="Προθέρμανση lag (7 ημ.)")],
+                       Patch(color=cmap(3), label="Πρώτη εβδομάδα, μόνο για τις υστερήσεις (7 ημ.)")],
               loc="upper center", bbox_to_anchor=(0.5, -0.15), ncol=4, fontsize=8)
     ax.set_title(f"Χρονικός διαχωρισμός: τελευταίες {C.TEST_DAYS} ημέρες κάθε μήνα = έλεγχος, "
                  f"οι {C.VAL_DAYS} προηγούμενες = επικύρωση")
